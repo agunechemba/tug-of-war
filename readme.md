@@ -1,151 +1,87 @@
-# Tug Of War Math Game
+# Tug of War Math Game
 
 ## Overview
 
-Tug Of War Math Game is a two-player interactive touch-screen math game designed for large displays, smart boards, and touch kiosks. Players compete by solving random math questions. Each correct answer pulls the rope toward their side in a tug-of-war match.
+Tug of War Math Game is an interactive **two-player educational game** built with **HTML, CSS, and JavaScript**. Players compete by solving **random math quiz questions** (addition, subtraction, multiplication, division). Correct answers pull a tug-of-war rope toward the player’s side. The first player to win the rope pull wins the round.
 
-The game combines learning and physical competition visuals to make mathematics fun, engaging, and competitive.
+The game is designed for **touch screens** and features a **start button, timer, and pop-up winner modal** for an engaging experience.
 
 ---
 
 ## Features
 
-- Two-player competitive gameplay
-- Touch-screen optimized controls
-- Random math quiz generator
-- Multiple choice answer buttons (tap to answer)
-- Real-time tug-of-war animation
-- Realistic character canvas art
-- Win detection and automatic reset
-- Responsive layout
+* **Two-player math quiz**:
+
+  * Player Left and Player Right panels.
+  * Multiple-choice questions for quick tapping.
+* **Tug-of-War animation**:
+
+  * Realistic child characters pulling a rope on a canvas.
+  * Rope moves dynamically based on correct answers.
+* **Start button**:
+
+  * Game only starts after players press "Start Game".
+  * Start button disappears once the game begins.
+* **Timer**:
+
+  * Tracks the duration of each match.
+  * Displayed at the top center of the screen.
+* **Winner modal**:
+
+  * Pops up when a player wins.
+  * Shows winning player and total time.
+  * Includes “Play Again” button to restart.
+* **Touch-friendly UI**:
+
+  * Large buttons and options for easy tapping on tablets or touch boards.
+* **Responsive layout**:
+
+  * Works on different screen sizes with canvas resizing dynamically.
 
 ---
 
-## Tech Stack
+## How to Play
 
-- HTML5
-- CSS3
-- JavaScript (Vanilla)
-- HTML5 Canvas (for animation and characters)
-
----
-
-## Game Layout
-
-The screen is divided into three main sections:
-
-### Left Panel
-- Displays math questions for Player Left
-- Shows four large answer buttons
-
-### Center Stage
-- Tug of war animation
-- Characters pull rope based on player performance
-
-### Right Panel
-- Displays math questions for Player Right
-- Shows four large answer buttons
-
----
-
-## How Gameplay Works
-
-1. Both players receive random math questions.
-2. Each player taps the correct answer from four options.
-3. Correct answers move the rope toward that player's side.
-4. When the rope reaches the limit, that player wins.
-5. Game resets automatically for the next round.
-
----
-
-## Supported Math Operations
-
-- Addition
-- Subtraction
-- Multiplication
-- Division (integer-safe generation)
-
----
-
-## Touch Screen Optimization
-
-- Large tap targets
-- No keyboard input required
-- Fast response interaction
-- Designed for classroom boards and kiosks
+1. Open the game in a modern browser on a touch screen or tablet.
+2. Press **Start Game** to begin.
+3. Both players solve math questions in their panels by tapping the correct answer.
+4. Correct answers pull the rope toward the player’s side.
+5. The first player to pull the rope completely wins.
+6. A **modal popup** shows the winner and time taken.
+7. Press **Play Again** to restart the game.
 
 ---
 
 ## Installation
 
-1. Download or clone the project
-2. Open the HTML file in any modern browser
-
-No build step required.
+1. Clone or download the repository.
+2. Open `index.html` in any modern browser.
+3. Ensure `style.css` and `script.js` are in the same folder as `index.html`.
 
 ---
 
-## Running the Game
-
-Simply open:
+## File Structure
 
 ```
-index.html
+tug-of-war-math-game/
+│
+├─ index.html        # Main HTML file
+├─ style.css         # Styles for layout, buttons, timer, modal
+├─ script.js         # Game logic, canvas drawing, timer, start button
+└─ README.md         # This file
 ```
 
-In a browser such as Chrome, Edge, Safari, or Firefox.
-
 ---
 
-## Customization Ideas
+## Technologies Used
 
-You can extend the project by adding:
-
-- Sound effects
-- Background music
-- Character animation states
-- Difficulty levels
-- Online multiplayer
-- Score tracking
-- Timer mode
-- Themed backgrounds (school, stadium, playground)
-
----
-
-## Performance Notes
-
-The game is optimized for:
-
-- Touch displays
-- Low-power school computers
-- Interactive whiteboards
-
----
-
-## Author
-
-Built by:
-
-**Agunechemba**  
-https://agunechemba.name.ng
-
----
-
-## License
-
-- Proprietary / Private Use
-
----
-
-## Future Roadmap (Suggested)
-
-- Multiplayer over network
-- Character customization
-- Leaderboards
-- Tournament mode
+* **HTML5** – Structure and layout
+* **CSS3** – Styling, flex/grid layout, responsive design
+* **JavaScript** – Game logic, timer, canvas animation, modal popup
+* **Canvas API** – Drawing tug-of-war rope and characters
 
 ---
 
 ## Credits
 
-Game Design, Development, and Concept by Agunechemba.
+Built by **[Agunechemba](https://agunechemba.name.ng)**.
