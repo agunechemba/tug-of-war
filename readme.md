@@ -128,7 +128,7 @@ The game is optimized for:
 Built by:
 
 **Agunechemba**  
-https://Agunechemba.name.ng
+https://agunechemba.name.ng
 
 ---
 
