@@ -4,338 +4,56 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tug of War Math Game</title>
-
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to bottom, #87ceeb, #ffffff);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      touch-action: manipulation;
-    }
-
-    main {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .game-container {
-      width: 95vw;
-      height: 90vh;
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      gap: 20px;
-      align-items: center;
-    }
-
-    .quiz-panel {
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 80%;
-    }
-
-    .quiz-panel h2 {
-      margin-bottom: 20px;
-    }
-
-    .question {
-      font-size: 32px;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .options {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      width: 100%;
-      max-width: 260px;
-    }
-
-    .option-btn {
-      font-size: 26px;
-      padding: 20px 10px;
-      border-radius: 16px;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-      transition: transform 0.1s;
-    }
-
-    .option-btn:active {
-      transform: scale(0.95);
-    }
-
-    .left-option {
-      background: #4CAF50;
-      color: white;
-    }
-
-    .right-option {
-      background: #2196F3;
-      color: white;
-    }
-
-    .stage-wrapper {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-    }
-
-    canvas {
-      width: 500px;
-      height: 500px;
-      max-width: 45vw;
-      max-height: 80vh;
-      background: linear-gradient(#e8f5ff, #ffffff);
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
-
-    footer {
-      text-align: center;
-      padding: 15px 10px;
-      font-size: 14px;
-      background: rgba(255,255,255,0.8);
-      backdrop-filter: blur(6px);
-      border-top: 1px solid rgba(0,0,0,0.05);
-    }
-
-    footer a {
-      color: #0077cc;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
-    }
-
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-
 <main>
 
-<div class="game-container">
+  <!-- TIMER -->
+<div class="timer" id="timer">Time: 0s</div>
 
-  <div class="quiz-panel">
-    <h2>Player Left</h2>
-    <div class="question" id="leftQuestion"></div>
-    <div class="options" id="leftOptions"></div>
-  </div>
-
-  <div class="stage-wrapper">
-    <canvas id="gameCanvas"></canvas>
-  </div>
-
-  <div class="quiz-panel">
-    <h2>Player Right</h2>
-    <div class="question" id="rightQuestion"></div>
-    <div class="options" id="rightOptions"></div>
-  </div>
-
+<!-- START BUTTON -->
+<div id="startContainer" style="text-align:center; margin-top: 50px;">
+  <button id="startBtn">Start Game</button>
 </div>
+
+  <!-- GAME PANELS AND CANVAS -->
+  <div class="game-container">
+
+    <div class="quiz-panel">
+      <h2>Player Left</h2>
+      <div class="question" id="leftQuestion"></div>
+      <div class="options" id="leftOptions"></div>
+    </div>
+
+    <div class="stage-wrapper">
+      <canvas id="gameCanvas"></canvas>
+    </div>
+
+    <div class="quiz-panel">
+      <h2>Player Right</h2>
+      <div class="question" id="rightQuestion"></div>
+      <div class="options" id="rightOptions"></div>
+    </div>
+
+  </div>
 
 </main>
 
+<!-- WINNER POPUP MODAL -->
+<div class="modal" id="winModal">
+  <div class="modal-box">
+    <h2 id="winText">Winner</h2>
+    <button onclick="closeModal()">Play Again</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
 <footer>
   Built by <a href="https://agunechemba.name.ng" target="_blank">Agunechemba</a>
 </footer>
 
-<script>
-
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-
-function resizeCanvas() {
-  canvas.width = canvas.clientWidth;
-  canvas.height = canvas.clientHeight;
-}
-
-window.addEventListener("resize", resizeCanvas);
-resizeCanvas();
-
-let ropePosition = 0;
-
-function generateQuestion() {
-  const ops = ["+", "-", "*", "/"];
-  const op = ops[Math.floor(Math.random() * ops.length)];
-
-  let a = Math.floor(Math.random() * 10) + 1;
-  let b = Math.floor(Math.random() * 10) + 1;
-
-  if (op === "/") a = a * b;
-
-  const correct = eval(`${a} ${op} ${b}`);
-
-  const options = new Set();
-  options.add(correct);
-
-  while (options.size < 4) {
-    const wrong = correct + Math.floor(Math.random() * 10 - 5);
-    if (wrong !== correct) options.add(wrong);
-  }
-
-  return {
-    q: `${a} ${op} ${b}`,
-    correct,
-    options: Array.from(options).sort(() => Math.random() - 0.5)
-  };
-}
-
-let leftQ, rightQ;
-
-function renderOptions(containerId, questionObj, side) {
-  const container = document.getElementById(containerId);
-  container.innerHTML = "";
-
-  questionObj.options.forEach(opt => {
-    const btn = document.createElement("button");
-    btn.className = `option-btn ${side === 'left' ? 'left-option' : 'right-option'}`;
-    btn.textContent = opt;
-    btn.onclick = () => submitAnswer(side, opt);
-    container.appendChild(btn);
-  });
-}
-
-function newQuestions() {
-  leftQ = generateQuestion();
-  rightQ = generateQuestion();
-
-  document.getElementById("leftQuestion").textContent = leftQ.q;
-  document.getElementById("rightQuestion").textContent = rightQ.q;
-
-  renderOptions("leftOptions", leftQ, "left");
-  renderOptions("rightOptions", rightQ, "right");
-}
-
-function submitAnswer(side, value) {
-  if (side === "left" && value === leftQ.correct) ropePosition -= 10;
-  if (side === "right" && value === rightQ.correct) ropePosition += 10;
-
-  checkWin();
-  newQuestions();
-}
-
-function checkWin() {
-  if (ropePosition <= -100) {
-    alert("Left Player Wins!");
-    ropePosition = 0;
-  }
-
-  if (ropePosition >= 100) {
-    alert("Right Player Wins!");
-    ropePosition = 0;
-  }
-}
-
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  const centerX = canvas.width / 2;
-  const centerY = canvas.height / 2;
-
-  drawBackground(centerY);
-
-  const ropeX = centerX + ropePosition * 2;
-
-  drawRope(ropeX, centerY);
-
-  drawRealisticChild(ropeX - 150, centerY, true);
-  drawRealisticChild(ropeX + 150, centerY, false);
-
-  requestAnimationFrame(draw);
-}
-
-function drawBackground(groundY) {
-  ctx.fillStyle = "#6ecb63";
-  ctx.fillRect(0, groundY + 40, canvas.width, canvas.height);
-
-  ctx.strokeStyle = "#444";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(0, groundY + 40);
-  ctx.lineTo(canvas.width, groundY + 40);
-  ctx.stroke();
-}
-
-function drawRope(x, y) {
-  ctx.lineWidth = 8;
-  ctx.strokeStyle = "#b08968";
-
-  ctx.beginPath();
-  ctx.moveTo(x - 140, y);
-  ctx.lineTo(x + 140, y);
-  ctx.stroke();
-
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = "#7f5539";
-
-  for (let i = -120; i <= 120; i += 20) {
-    ctx.beginPath();
-    ctx.moveTo(x + i, y - 4);
-    ctx.lineTo(x + i + 10, y + 4);
-    ctx.stroke();
-  }
-}
-
-function drawRealisticChild(x, y, isLeft) {
-  const skin = "#f1c27d";
-
-  ctx.fillStyle = skin;
-  ctx.beginPath();
-  ctx.arc(x, y - 55, 22, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = "#222";
-  ctx.fillRect(x - 20, y - 70, 40, 15);
-
-  ctx.fillStyle = isLeft ? "#ff6b6b" : "#4d96ff";
-  ctx.fillRect(x - 18, y - 35, 36, 50);
-
-  ctx.fillStyle = skin;
-  ctx.fillRect(x - 28, y - 35, 10, 45);
-  ctx.fillRect(x + 18, y - 35, 10, 45);
-
-  ctx.strokeStyle = skin;
-  ctx.lineWidth = 10;
-
-  ctx.beginPath();
-  if (isLeft) {
-    ctx.moveTo(x + 10, y - 10);
-    ctx.lineTo(x + 55, y);
-  } else {
-    ctx.moveTo(x - 10, y - 10);
-    ctx.lineTo(x - 55, y);
-  }
-  ctx.stroke();
-
-  ctx.fillStyle = "#333";
-  ctx.fillRect(x - 18, y + 15, 14, 40);
-  ctx.fillRect(x + 4, y + 15, 14, 40);
-
-  ctx.fillStyle = "#111";
-  ctx.fillRect(x - 20, y + 55, 18, 8);
-  ctx.fillRect(x + 4, y + 55, 18, 8);
-}
-
-newQuestions();
-draw();
-
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
