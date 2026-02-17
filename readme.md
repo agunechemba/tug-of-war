@@ -18,7 +18,6 @@ The game combines learning and physical competition visuals to make mathematics 
 - Realistic character canvas art
 - Win detection and automatic reset
 - Responsive layout
-- Credit footer with author link
 
 ---
 
@@ -134,10 +133,6 @@ https://agunechemba.name.ng
 
 ## License
 
-You can choose your preferred license, such as:
-
-- MIT License
-- Apache 2.0
 - Proprietary / Private Use
 
 ---
@@ -148,21 +143,9 @@ You can choose your preferred license, such as:
 - Character customization
 - Leaderboards
 - Tournament mode
-- Classroom analytics dashboard
-
----
-
-## Contribution
-
-If you want others to contribute later, you can add:
-
-- Pull request guidelines
-- Code style rules
-- Issue templates
 
 ---
 
 ## Credits
 
 Game Design, Development, and Concept by Agunechemba.
-
