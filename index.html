@@ -10,38 +10,42 @@
 <body>
 <main>
 
-  <!-- TIMER -->
 <div class="timer" id="timer">Time: 0s</div>
 
-<!-- START BUTTON -->
-<div id="startContainer" style="text-align:center; margin-top: 50px;">
-  <button id="startBtn">Start Game</button>
-</div>
-
-  <!-- GAME PANELS AND CANVAS -->
-  <div class="game-container">
-
-    <div class="quiz-panel">
-      <h2>Player Left</h2>
-      <div class="question" id="leftQuestion"></div>
-      <div class="options" id="leftOptions"></div>
-    </div>
-
-    <div class="stage-wrapper">
-      <canvas id="gameCanvas"></canvas>
-    </div>
-
-    <div class="quiz-panel">
-      <h2>Player Right</h2>
-      <div class="question" id="rightQuestion"></div>
-      <div class="options" id="rightOptions"></div>
-    </div>
-
+<div class="game-container">
+  <div class="quiz-panel" id="leftPanel">
+    <h2>Player Left</h2>
+    <div class="lives" id="leftLives"></div>
+    <div class="question" id="leftQuestion">Ready?</div>
+    <div class="options" id="leftOptions"></div>
   </div>
+
+  <div class="stage-wrapper">
+    <div id="welcomeBox" class="welcome-box">
+      <h1>Tug of War Math</h1>
+      <p>Solve math problems to pull the rope!</p>
+      <ul style="text-align: left; display: inline-block;">
+        <li>Correct Answer: Pull rope</li>
+        <li>Wrong Answer: Lose a life (❤️)</li>
+        <li>Lose 5 lives = Game Over</li>
+      </ul>
+      <div id="startContainer">
+        <button id="startBtn">Start Game</button>
+      </div>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+  </div>
+
+  <div class="quiz-panel" id="rightPanel">
+    <h2>Player Right</h2>
+    <div class="lives" id="rightLives"></div>
+    <div class="question" id="rightQuestion">Ready?</div>
+    <div class="options" id="rightOptions"></div>
+  </div>
+</div>
 
 </main>
 
-<!-- WINNER POPUP MODAL -->
 <div class="modal" id="winModal">
   <div class="modal-box">
     <h2 id="winText">Winner</h2>
@@ -49,7 +53,6 @@
   </div>
 </div>
 
-<!-- FOOTER -->
 <footer>
   Built by <a href="https://agunechemba.name.ng" target="_blank">Agunechemba</a>
 </footer>
