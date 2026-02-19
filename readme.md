@@ -39,8 +39,7 @@ This version features a **5-lives health system**, **realistic animated characte
 
 ## File Structure
 
-
-```
+---
 
 tug-of-war-math-game/
 │
@@ -49,7 +48,6 @@ tug-of-war-math-game/
 ├─ script.js         # Enhanced character drawing, lives logic, and game state
 └─ README.md         # Documentation and instructions
 
-```
 
 ---
 
