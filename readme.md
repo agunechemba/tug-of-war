@@ -1,72 +1,69 @@
 ```markdown
-# Tug of War Math Game (Enhanced Version)
+# Tug of War Math - Ultra Edition 🏆
 
 ## Overview
+**Tug of War Math** is a high-energy, two-player educational game built with **HTML5, CSS3, and JavaScript**. Players engage in a head-to-head mental math battle where speed and accuracy physically move the rope on the screen. 
 
-Tug of War Math Game is an interactive, two-player educational experience built with **HTML5, CSS3, and JavaScript**. Players compete in a head-to-head math battle where speed and accuracy determine who wins the tug-of-war.
-
-This version features a **5-lives health system**, **realistic animated characters**, and a **welcome interface** with integrated instructions.
-
----
-
-## New Features
-
-* **Lives System (❤️)**: Each player starts with 5 lives. A wrong answer results in the loss of a life and a visual "shake" effect on the player's panel.
-* **Enhanced Canvas Graphics**: 
-    * Detailed characters with hair, facial expressions, and clothing.
-    * Dynamic shadows and a sky-gradient background.
-    * Twisted-rope texture for a more realistic feel.
-* **Dual-Condition Victory**:
-    * **Strength Win**: Pull the rope completely to your side.
-    * **Survival Win**: Outlast your opponent if they exhaust all 5 lives.
-* **Interactive Welcome Box**: The game begins with a central instruction overlay, explaining the rules before the action starts.
-* **Visual Feedback**: Quiz panels shake and glow red when a mistake is made, providing immediate haptic-style feedback.
+This version features a **Life-Stealing mechanic**, **realistic animated characters**, and **dynamic physics-based animations**.
 
 ---
 
-## How to Play
+## 🚀 Key Features
 
-1.  **Start**: Launch `index.html` and click **Start Game** in the center box.
-2.  **Solve**: Random math problems (Addition, Subtraction, Multiplication) appear in each player's panel.
-3.  **Pull**: Tap the correct answer to pull the rope toward your side.
-4.  **Avoid Mistakes**: Clicking a wrong answer will cost you one heart (❤️).
-5.  **Win**: 
-    * Pull the opponent past the threshold.
-    * **OR** wait for the opponent to lose all 5 lives.
-6.  **Restart**: Use the "Play Again" button in the winner modal to reset lives, the timer, and the rope.
+* **Life-Stealing Mechanic (❤️)**: 
+    * Players start with **5 lives**.
+    * **Heal:** Every correct answer adds +1 life (capped at 10).
+    * **Damage:** Every wrong answer removes -1 life and triggers a visual "shake" effect.
+* **Realistic Canvas Graphics**:
+    * Characters feature detailed hair, facial expressions (strained effort), and proper body proportions.
+    * Elliptical ground shadows and a sky-gradient background for depth.
+* **Dynamic Animations**:
+    * **Pull Jerk:** The rope "jerks" toward the player immediately upon a correct answer.
+    * **Error Shake:** The quiz panel vibrates violently when a wrong answer is chosen.
+* **Full Math Suite**: Generates random questions across **Addition, Subtraction, Multiplication, and Division** (with logic to ensure division results are always whole numbers).
+* **Cinematic Celebration**: A full-screen, high-impact animated overlay triggers when a player wins, before transitioning to the final score modal.
 
 ---
 
-## File Structure
+## 🕹️ How to Play
+
+1.  **Launch**: Open `index.html` in any modern web browser.
+2.  **The Goal**: Either pull the rope completely to your side **OR** deplete your opponent's lives to 0.
+3.  **Controls**: 
+    * **Player Left**: Tap/Click the correct result in the green panel.
+    * **Player Right**: Tap/Click the correct result in the blue panel.
+4.  **Lives**: Keep an eye on your heart bar! Correct answers help you recover from previous mistakes.
+5.  **Winning**: Once a victory condition is met, a large "WINNER" animation will play.
 
 ---
+
+## 📂 File Structure
+
+
+
 
 tug-of-war-math-game/
 │
-├─ index.html        # Game structure with lives containers and welcome box
-├─ style.css         # Modern UI, shake animations, and sky gradients
-├─ script.js         # Enhanced character drawing, lives logic, and game state
-└─ README.md         # Documentation and instructions
+├── index.html        # Game layout, celebration overlay, and instructions
+├── style.css         # Animations (shake, bounce, pulse), layout, and UI polish
+├── script.js         # Math engine, Canvas rendering, and game state logic
+└── README.md         # Documentation
 
 
----
-
-## Installation
-
-1.  Download the project files into a single folder.
-2.  Ensure `index.html`, `style.css`, and `script.js` are present.
-3.  Open `index.html` in any modern web browser (Chrome, Edge, Safari, or Firefox).
-4.  *Optional*: For the best experience, use a touch-screen device or tablet for head-to-head play.
 
 ---
 
-## Technical Details
+## 🛠️ Technical Highlights
 
-* **Canvas API**: Uses `requestAnimationFrame` for smooth 60fps rendering of the pulling animation.
-* **CSS Animations**: Uses `@keyframes` for the "shake" error effect and modal transitions.
-* **Responsive Design**: The game uses a CSS Grid layout that adapts to various screen widths while maintaining the tug-of-war center stage.
+* **Canvas API**: Used for drawing high-detail characters and handling the rope physics at 60fps.
+* **CSS Keyframes**: Handles the complex celebration animations and the "panel-shake" feedback loop.
+* **Responsive Design**: The game uses a `grid-template-columns` layout that keeps the "Stage" centered regardless of screen size.
+* **Smart Math Logic**: The division engine calculates the divisor and quotient first to ensure the dividend is always a clean, whole number.
 
 ---
 
 ## Author
-Built by [Agunechemba](https://agunechemba.name.ng).
+Built with ❤️ by **Agunechemba**
+[agunechemba.name.ng](https://agunechemba.name.ng)
+
+```

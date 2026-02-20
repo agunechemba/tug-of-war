@@ -3,58 +3,62 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tug of War Math Game</title>
+  <title>Tug of War Math - Ultra Edition</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 <main>
+  <div class="timer" id="timer">Time: 0s</div>
 
-<div class="timer" id="timer">Time: 0s</div>
-
-<div class="game-container">
-  <div class="quiz-panel" id="leftPanel">
-    <h2>Player Left</h2>
-    <div class="lives" id="leftLives"></div>
-    <div class="question" id="leftQuestion">Ready?</div>
-    <div class="options" id="leftOptions"></div>
+  <div id="celebration" class="celebration-overlay">
+    <h1 id="celebrationText">WINNER!</h1>
+    <p>Incredible Pulling Power!</p>
   </div>
 
-  <div class="stage-wrapper">
-    <div id="welcomeBox" class="welcome-box">
-      <h1>Tug of War Math</h1>
-      <p>Solve math problems to pull the rope!</p>
-      <ul style="text-align: left; display: inline-block;">
-        <li>Correct Answer: Pull rope</li>
-        <li>Wrong Answer: Lose a life (❤️)</li>
-        <li>Lose 5 lives = Game Over</li>
-      </ul>
-      <div id="startContainer">
-        <button id="startBtn">Start Game</button>
-      </div>
+  <div class="game-container">
+    <div class="quiz-panel" id="leftPanel">
+      <h2>Player Left</h2>
+      <div class="lives" id="leftLives">❤️❤️❤️❤️❤️</div>
+      <div class="question" id="leftQuestion">Ready?</div>
+      <div class="options" id="leftOptions"></div>
     </div>
-    <canvas id="gameCanvas"></canvas>
-  </div>
 
-  <div class="quiz-panel" id="rightPanel">
-    <h2>Player Right</h2>
-    <div class="lives" id="rightLives"></div>
-    <div class="question" id="rightQuestion">Ready?</div>
-    <div class="options" id="rightOptions"></div>
-  </div>
-</div>
+    <div class="stage-wrapper">
+      <div id="welcomeBox" class="welcome-box">
+        <h1>Tug of War Math</h1>
+        <p>A Battle of Speed & Accuracy</p>
+        <ul class="rules-list">
+          <li>✅ <b>Correct:</b> Pull rope + Gain 1 Life (❤️)</li>
+          <li>❌ <b>Wrong:</b> Lose 1 Life</li>
+          <li>🎯 <b>Goal:</b> Pull the opponent or outlast them</li>
+        </ul>
+        <button id="startBtn">START GAME</button>
+      </div>
+      <canvas id="gameCanvas"></canvas>
+    </div>
 
+    <div class="quiz-panel" id="rightPanel">
+      <h2>Player Right</h2>
+      <div class="lives" id="rightLives">❤️❤️❤️❤️❤️</div>
+      <div class="question" id="rightQuestion">Ready?</div>
+      <div class="options" id="rightOptions"></div>
+    </div>
+  </div>
 </main>
 
 <div class="modal" id="winModal">
   <div class="modal-box">
-    <h2 id="winText">Winner</h2>
+    <h2 id="winText">Winner Result</h2>
     <button onclick="closeModal()">Play Again</button>
   </div>
 </div>
 
-<footer>
-  Built by <a href="https://agunechemba.name.ng" target="_blank">Agunechemba</a>
+
+<footer class="game-footer">
+  <div class="footer-content">
+    <span>Built by </span>
+    <a href="https://agunechemba.name.ng" target="_blank" class="footer-link">Agunechemba</a>
+  </div>
 </footer>
 
 <script src="script.js"></script>

@@ -1,31 +1,22 @@
-/* --- ROOT & BODY --- */
 body {
   margin: 0;
-  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: #f0f2f5;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Prevents scrolling during intense gameplay */
+  overflow: hidden;
   touch-action: manipulation;
 }
 
-main {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-}
+main { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
 
-/* --- GAME LAYOUT --- */
 .game-container {
-  width: 100%;
-  max-width: 1400px;
+  width: 98vw;
   height: 90vh;
   display: grid;
-  grid-template-columns: 1fr 1.6fr 1fr; /* Center stage is wider */
-  gap: 20px;
+  grid-template-columns: 1fr 1.6fr 1fr;
+  gap: 15px;
   align-items: center;
 }
 
@@ -33,191 +24,166 @@ main {
 .quiz-panel {
   background: white;
   border-radius: 24px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-  padding: 30px 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   align-items: center;
-  height: 80%;
-  transition: transform 0.2s, border 0.3s;
-  z-index: 10;
+  height: 85%;
   border: 4px solid transparent;
+  transition: 0.3s ease;
 }
 
-.lives {
-  font-size: 24px;
-  margin-bottom: 10px;
-  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
-  letter-spacing: 4px;
-}
+.lives { font-size: 22px; margin-bottom: 10px; color: #ff4757; letter-spacing: 2px; }
 
-/* Shake effect for wrong answers */
-.shake {
-  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
-  border-color: #ff4757;
+/* Error Shake Effect */
+.shake { 
+    animation: shakeAnim 0.4s cubic-bezier(.36,.07,.19,.97) both; 
+    border-color: #ff4757;
 }
-
-@keyframes shake {
+@keyframes shakeAnim {
   10%, 90% { transform: translate3d(-1px, 0, 0); }
-  20%, 80% { transform: translate3d(2px, 0, 0); }
   30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
   40%, 60% { transform: translate3d(4px, 0, 0); }
 }
 
-.question {
-  font-size: 48px;
-  font-weight: 800;
-  color: #2d3436;
-  margin: 20px 0;
-}
-
-.options {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  width: 100%;
-}
+.question { font-size: 48px; font-weight: 800; margin: 20px 0; color: #2d3436; }
+.options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
 
 .option-btn {
-  font-size: 26px;
-  font-weight: bold;
-  padding: 20px 10px;
-  border-radius: 16px;
+  font-size: 24px;
+  padding: 18px;
+  border-radius: 14px;
   border: none;
   cursor: pointer;
-  transition: all 0.1s ease;
-  box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+  background: #f8f9fa;
+  box-shadow: 0 4px 0 #dee2e6;
+  transition: 0.1s;
+}
+.option-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #dee2e6; }
+.left-option:hover { background: #2ecc71; color: white; }
+.right-option:hover { background: #3498db; color: white; }
+
+/* --- STAGE & CELEBRATION --- */
+.stage-wrapper { position: relative; height: 85%; width: 100%; }
+canvas {
+  width: 100%; height: 100%;
+  background: linear-gradient(#87ceeb 0%, #e8f5ff 70%, #ffffff 100%);
+  border-radius: 30px;
+  box-shadow: inset 0 0 50px rgba(0,0,0,0.05), 0 10px 30px rgba(0,0,0,0.1);
 }
 
-.left-option { background: #2ecc71; color: white; }
-.right-option { background: #3498db; color: white; }
-
-.option-btn:hover { filter: brightness(1.1); }
-.option-btn:active {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 rgba(0,0,0,0.2);
+.welcome-box {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.98);
+  padding: 40px; border-radius: 30px; text-align: center;
+  z-index: 100; box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  width: 80%;
 }
 
-/* --- STAGE & CANVAS --- */
-.stage-wrapper {
-  position: relative;
-  height: 85%;
-  width: 100%;
+.celebration-overlay {
+  position: absolute; inset: 0; display: none;
+  flex-direction: column; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.3); z-index: 500; pointer-events: none;
+}
+#celebrationText {
+  font-size: 90px; font-weight: 900;
+  animation: winBounce 0.8s infinite alternate ease-in-out;
+}
+@keyframes winBounce {
+  from { transform: scale(0.9) rotate(-3deg); }
+  to { transform: scale(1.1) rotate(3deg); }
+}
+
+/* --- UI COMPONENTS --- */
+#startBtn {
+  font-size: 24px; font-weight: bold; padding: 15px 60px;
+  border: none; background: #27ae60; color: white;
+  border-radius: 50px; cursor: pointer; box-shadow: 0 8px 15px rgba(39,174,96,0.3);
+}
+
+.rules-list {
+  list-style: none;      /* Removes bullets */
+  padding-left: 0;       /* Removes left indentation */
+  margin-left: 0;        /* Optional: aligns fully left */
+}
+
+
+/* --- LAYOUT ADJUSTMENT --- */
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1; /* Pushes the footer to the bottom */
   display: flex;
   align-items: center;
   justify-content: center;
-  perspective: 1000px;
 }
 
-canvas {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(#87ceeb 0%, #e8f5ff 70%, #ffffff 100%);
-  border-radius: 30px;
-  box-shadow: inset 0 0 80px rgba(0,0,0,0.05), 0 20px 50px rgba(0,0,0,0.15);
-  display: block;
-}
-
-/* --- WELCOME OVERLAY --- */
-.welcome-box {
-  position: absolute;
-  background: rgba(255, 255, 255, 0.96);
-  padding: 40px;
-  border-radius: 30px;
+/* --- FOOTER STYLING --- */
+.game-footer {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px); /* Modern blur effect */
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 15px 0;
   text-align: center;
-  box-shadow: 0 30px 60px rgba(0,0,0,0.3);
-  z-index: 50;
-  max-width: 85%;
-  border: 2px solid #eee;
-}
-
-.welcome-box h1 {
-  margin-top: 0;
-  font-size: 32px;
-  color: #2c3e50;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-.welcome-box p { font-size: 18px; color: #636e72; }
-.welcome-box ul {
-  text-align: left;
-  display: inline-block;
-  margin: 20px 0;
-  font-size: 16px;
-  color: #2d3436;
-}
-
-/* --- UI ELEMENTS --- */
-.timer {
-  position: fixed;
-  top: 20px;
-  background: white;
-  padding: 10px 25px;
-  border-radius: 50px;
-  font-weight: bold;
-  font-size: 18px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  width: 100%;
   z-index: 100;
 }
 
-#startBtn {
-  font-size: 24px;
-  font-weight: bold;
-  padding: 15px 50px;
-  border: none;
-  border-radius: 50px;
-  background: #27ae60;
-  color: white;
-  cursor: pointer;
-  transition: transform 0.2s;
-  box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3);
-}
-
-#startBtn:hover { transform: scale(1.05); }
-
-/* --- MODAL --- */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(44, 62, 80, 0.8);
-  backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  visibility: hidden;
-  opacity: 0;
-  transition: 0.4s;
-  z-index: 1000;
-}
-
-.modal.active {
-  visibility: visible;
-  opacity: 1;
-}
-
-.modal-box {
-  background: white;
-  padding: 50px;
-  border-radius: 30px;
-  text-align: center;
-  transform: translateY(20px);
-  transition: 0.4s;
-}
-
-.modal.active .modal-box { transform: translateY(0); }
-
-.modal-box h2 { font-size: 36px; margin-bottom: 25px; color: #2d3436; }
-
-/* --- FOOTER --- */
-footer {
-  text-align: center;
-  padding: 15px;
+.footer-content {
   font-size: 14px;
-  color: #636e72;
-  background: white;
-  border-top: 1px solid #eee;
+  color: #2d3436;
+  font-weight: 500;
+  letter-spacing: 0.5px;
 }
 
-footer a { color: #3498db; text-decoration: none; font-weight: bold; }
+.footer-link {
+  color: #3498db;
+  text-decoration: none;
+  font-weight: 700;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #2980b9;
+}
+
+/* Subtle underline animation on hover */
+.footer-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: #2980b9;
+  transition: width 0.3s ease;
+}
+
+.footer-link:hover::after {
+  width: 100%;
+}
+
+/* Ensure the footer looks good on small mobile screens */
+@media (max-width: 600px) {
+  .game-footer {
+    padding: 10px 0;
+  }
+  .footer-content {
+    font-size: 12px;
+  }
+}
+
+
+
+.timer { position: fixed; top: 15px; background: white; padding: 8px 25px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 200; }
+
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: 0.3s; z-index: 1000; }
+.modal.active { visibility: visible; opacity: 1; }
+.modal-box { background: white; padding: 50px; border-radius: 30px; text-align: center; }
