@@ -12,7 +12,7 @@
     * **Pull Jerk:** The rope "jerks" toward the player immediately upon a correct answer.
     * **Error Shake:** The quiz panel vibrates violently when the wrong answer is chosen.
 * **Full Math Suite**: Generates random questions across **Addition, Subtraction, Multiplication, and Division**.
-* 
+
 * **Single-Player vs AI Mode**
    * Battle against an intelligent AI opponent
    * Choose from three difficulty levels:
