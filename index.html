@@ -3,43 +3,88 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tug of War Math - Ultra Edition</title>
+  <title>Tug of War - Player Edition</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔️</text></svg>">
 </head>
 <body>
 <main>
-  <div class="timer" id="timer">Time: 0s</div>
+  <div class="timer" id="timer">⏱️ Time: 0s</div>
 
   <div id="celebration" class="celebration-overlay">
     <h1 id="celebrationText">WINNER!</h1>
-    <p>Incredible Pulling Power!</p>
+    <p id="celebrationSubtext">Incredible Pulling Power!</p>
   </div>
 
   <div class="game-container">
     <div class="quiz-panel" id="leftPanel">
-      <h2>Player Left</h2>
+      <h2 id="leftPlayerName">Player Left</h2>
       <div class="lives" id="leftLives">❤️❤️❤️❤️❤️</div>
+      <div class="score-display" id="leftScore">Score: 0</div>
+      <div class="streak-display" id="leftStreak">🔥 Streak: 0</div>
       <div class="question" id="leftQuestion">Ready?</div>
       <div class="options" id="leftOptions"></div>
     </div>
 
     <div class="stage-wrapper">
       <div id="welcomeBox" class="welcome-box">
-        <h1>Tug of War Math</h1>
+        <h1>Tug of War</h1>
         <p>A Battle of Speed & Accuracy</p>
+         <a href="playWithAI.html" class="footer-link">Play With AI</a>        
+        <div class="player-name-inputs">
+          <div class="input-group">
+            <label for="leftNameInput">Player 1 (Left)</label>
+            <input type="text" id="leftNameInput" placeholder="Enter name..." value="Player 1" maxlength="15">
+            <div class="color-picker">
+              <label>Color:</label>
+              <input type="color" id="leftColor" value="#e74c3c">
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="rightNameInput">Player 2 (Right)</label>
+            <input type="text" id="rightNameInput" placeholder="Enter name..." value="Player 2" maxlength="15">
+            <div class="color-picker">
+              <label>Color:</label>
+              <input type="color" id="rightColor" value="#3498db">
+            </div>
+          </div>
+        </div>
+
+        <div class="game-settings">
+          <div class="setting-group">
+            <label>Difficulty:</label>
+            <select id="difficultySelect">
+              <option value="easy">Easy</option>
+              <option value="medium" selected>Medium</option>
+              <option value="hard">Hard</option>
+            </select>
+          </div>
+          <div class="setting-group">
+            <label>Starting Lives:</label>
+            <select id="livesSelect">
+              <option value="3">3</option>
+              <option value="5" selected>5</option>
+              <option value="7">7</option>
+              <option value="10">10</option>
+            </select>
+          </div>
+        </div>
+
         <ul class="rules-list">
           <li>✅ <b>Correct:</b> Pull rope + Gain 1 Life (❤️)</li>
           <li>❌ <b>Wrong:</b> Lose 1 Life</li>
           <li>🎯 <b>Goal:</b> Pull the opponent or outlast them</li>
         </ul>
-        <button id="startBtn">START GAME</button>
+        <button id="startBtn">🚀 START GAME</button>
       </div>
-      <canvas id="gameCanvas"></canvas>
+      <canvas id="gameCanvas" aria-label="Tug of war game canvas showing rope position between two players"></canvas>
     </div>
 
     <div class="quiz-panel" id="rightPanel">
-      <h2>Player Right</h2>
+      <h2 id="rightPlayerName">Player Right</h2>
       <div class="lives" id="rightLives">❤️❤️❤️❤️❤️</div>
+      <div class="score-display" id="rightScore">Score: 0</div>
+      <div class="streak-display" id="rightStreak">🔥 Streak: 0</div>
       <div class="question" id="rightQuestion">Ready?</div>
       <div class="options" id="rightOptions"></div>
     </div>
@@ -49,18 +94,17 @@
 <div class="modal" id="winModal">
   <div class="modal-box">
     <h2 id="winText">Winner Result</h2>
-    <button onclick="closeModal()">Play Again</button>
+    <div id="statsContainer"></div>
+    <button onclick="closeModal()">🔄 Play Again</button>
   </div>
 </div>
-
 
 <footer class="game-footer">
   <div class="footer-content">
     <span>Built by </span>
-    <a href="https://agunechemba.name.ng" target="_blank" class="footer-link">Agunechemba</a>
+    <a href="https://agunechemba.name.ng" target="_blank" class="footer-link">Agunechemba Ekene</a>
   </div>
 </footer>
-
 <script src="script.js"></script>
 </body>
 </html>
