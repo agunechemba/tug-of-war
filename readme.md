@@ -13,7 +13,7 @@
     * **Error Shake:** The quiz panel vibrates violently when the wrong answer is chosen.
 * **Full Math Suite**: Generates random questions across **Addition, Subtraction, Multiplication, and Division**.
 
-### **[Explore the project here: Tug Of War](https://agunechemba.name.ng/tug-of-war/)**
+### **[Play Tug Of War](https://agunechemba.name.ng/tug-of-war/)**
 
 *[Author: Agunechemba Ekene](https://agunechemba.name.ng)*
 
