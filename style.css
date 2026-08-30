@@ -137,6 +137,18 @@ canvas {
   border-color: #3498db;
 }
 
+/* AI Mode specific - disabled inputs */
+.input-group input[type="text"][disabled] {
+  background: #e9ecef;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.input-group input[type="color"][disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .color-picker {
   margin-top: 8px;
   display: flex;
@@ -362,6 +374,33 @@ main {
 }
 
 .modal-box button:hover { transform: scale(1.05); }
+
+/* --- AI MODE SPECIFIC STYLES --- */
+
+/* AI panel option buttons */
+.ai-mode .option-btn.right-option {
+  opacity: 0.85;
+}
+
+.ai-mode .option-btn.right-option:hover {
+  background: #3498db;
+  color: white;
+}
+
+/* AI panel buttons should look disabled but still clickable */
+.ai-mode #rightPanel .option-btn {
+  cursor: default;
+}
+
+.ai-mode #rightPanel .option-btn:active {
+  transform: none;
+  box-shadow: 0 4px 0 #dee2e6;
+}
+
+/* AI mode welcome box adjustments */
+.ai-mode .player-name-inputs .input-group:last-child {
+  opacity: 0.8;
+}
 
 /* --- RESPONSIVE --- */
 @media (max-width: 1024px) {

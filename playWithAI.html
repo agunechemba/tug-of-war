@@ -6,722 +6,110 @@
     <title>Tug of War – vs AI</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
-    <style>
-        /* Additional overrides for single-player mode */
-        .input-group input[type="text"][disabled] {
-            background: #e9ecef;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-        .input-group input[type="color"][disabled] {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .option-btn.right-option {
-            opacity: 0.85;
-        }
-        .option-btn.right-option:hover {
-            background: #3498db;
-            color: white;
-        }
-        /* Ensure AI panel doesn't look completely disabled */
-        #rightPanel .option-btn {
-            cursor: default;
-        }
-        #rightPanel .option-btn:active {
-            transform: none;
-            box-shadow: 0 4px 0 #dee2e6;
-        }
-        /* Welcome box adjustments for single player */
-        .player-name-inputs .input-group:last-child {
-            opacity: 0.8;
-        }
-    </style>
 </head>
-<body>
-    <main>
-        <div class="timer" id="timer">⏱️ Time: 0s</div>
+<body class="ai-mode">
+<main>
+    <div class="timer" id="timer">⏱️ Time: 0s</div>
 
-        <div id="celebration" class="celebration-overlay">
-            <h1 id="celebrationText">WINNER!</h1>
-            <p id="celebrationSubtext">Incredible Pulling Power!</p>
-        </div>
-
-        <div class="game-container">
-            <!-- PLAYER (LEFT) -->
-            <div class="quiz-panel" id="leftPanel">
-                <h2 id="leftPlayerName">You</h2>
-                <div class="lives" id="leftLives">❤️❤️❤️❤️❤️</div>
-                <div class="score-display" id="leftScore">Score: 0</div>
-                <div class="streak-display" id="leftStreak">🔥 Streak: 0</div>
-                <div class="question" id="leftQuestion">Ready?</div>
-                <div class="options" id="leftOptions"></div>
-            </div>
-
-            <!-- STAGE -->
-            <div class="stage-wrapper">
-                <div id="welcomeBox" class="welcome-box">
-                    <h1>Tug of War</h1>
-                    <p>Battle the AI – Single Player</p>
-                   <a href="index.html" class="footer-link">Play With A Friend</a>
-
-                    <div class="player-name-inputs">
-                        <div class="input-group">
-                            <label for="leftNameInput">Your Name</label>
-                            <input type="text" id="leftNameInput" placeholder="Enter name..." value="You" maxlength="15">
-                            <div class="color-picker">
-                                <label>Color:</label>
-                                <input type="color" id="leftColor" value="#e74c3c">
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label>🤖 AI Opponent</label>
-                            <input type="text" id="rightNameInput" placeholder="AI name" value="AI" maxlength="15" disabled>
-                            <div class="color-picker">
-                                <label>Color:</label>
-                                <input type="color" id="rightColor" value="#3498db" disabled>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="game-settings">
-                        <div class="setting-group">
-                            <label>AI Difficulty:</label>
-                            <select id="difficultySelect">
-                                <option value="easy">Easy</option>
-                                <option value="medium" selected>Medium</option>
-                                <option value="hard">Hard</option>
-                            </select>
-                        </div>
-                        <div class="setting-group">
-                            <label>Starting Lives:</label>
-                            <select id="livesSelect">
-                                <option value="3">3</option>
-                                <option value="5" selected>5</option>
-                                <option value="7">7</option>
-                                <option value="10">10</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <ul class="rules-list">
-                        <li>✅ <b>Correct:</b> Pull rope + Gain 1 Life (❤️)</li>
-                        <li>❌ <b>Wrong:</b> Lose 1 Life</li>
-                        <li>🎯 <b>Goal:</b> Pull the AI or outlast them</li>
-                    </ul>
-                    <button id="startBtn">🚀 START GAME</button>
-                </div>
-                <canvas id="gameCanvas" aria-label="Tug of war game canvas showing rope position between player and AI"></canvas>
-            </div>
-
-            <!-- AI (RIGHT) -->
-            <div class="quiz-panel" id="rightPanel">
-                <h2 id="rightPlayerName">AI</h2>
-                <div class="lives" id="rightLives">❤️❤️❤️❤️❤️</div>
-                <div class="score-display" id="rightScore">Score: 0</div>
-                <div class="streak-display" id="rightStreak">🔥 Streak: 0</div>
-                <div class="question" id="rightQuestion">Ready?</div>
-                <div class="options" id="rightOptions"></div>
-            </div>
-        </div>
-    </main>
-
-    <div class="modal" id="winModal">
-        <div class="modal-box">
-            <h2 id="winText">Winner Result</h2>
-            <div id="statsContainer"></div>
-            <button onclick="closeModal()">🔄 Play Again</button>
-        </div>
+    <div id="celebration" class="celebration-overlay">
+        <h1 id="celebrationText">WINNER!</h1>
+        <p id="celebrationSubtext">Incredible Pulling Power!</p>
     </div>
 
-    <footer class="game-footer">
-        <div class="footer-content">
-            <span>Built by </span>
-            <a href="https://agunechemba.name.ng" target="_blank" class="footer-link">Agunechemba Ekene</a>
+    <div class="game-container">
+        <!-- PLAYER (LEFT) -->
+        <div class="quiz-panel" id="leftPanel">
+            <h2 id="leftPlayerName">You</h2>
+            <div class="lives" id="leftLives">❤️❤️❤️❤️❤️</div>
+            <div class="score-display" id="leftScore">Score: 0</div>
+            <div class="streak-display" id="leftStreak">🔥 Streak: 0</div>
+            <div class="question" id="leftQuestion">Ready?</div>
+            <div class="options" id="leftOptions"></div>
         </div>
-    </footer>
 
-    <script>
-        // ----- script.js (single-player vs AI) -----
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-        const welcomeBox = document.getElementById("welcomeBox");
-        const celebration = document.getElementById("celebration");
-        const celebrationText = document.getElementById("celebrationText");
-        const celebrationSubtext = document.getElementById("celebrationSubtext");
+        <!-- STAGE -->
+        <div class="stage-wrapper">
+            <div id="welcomeBox" class="welcome-box">
+                <h1>Tug of War</h1>
+                <p>Battle the AI – Single Player</p>
+                <a href="index.html" class="footer-link">Play With A Friend</a>
 
-        let ropePosition = 0;
-        let pullOffset = 0;
-        let seconds = 0;
-        let gameRunning = false;
-        let leftLives = 5,
-            rightLives = 5;
-        let leftScore = 0,
-            rightScore = 0;
-        let leftStreak = 0,
-            rightStreak = 0;
-        const MAX_LIVES = 10;
-        let timerInterval, leftQ, rightQ;
-
-        // Player settings
-        let leftPlayerName = "You";
-        let rightPlayerName = "AI";
-        let leftPlayerColor = "#e74c3c";
-        let rightPlayerColor = "#3498db";
-        let difficulty = "medium";
-        let startingLives = 5;
-
-        // AI state
-        let aiThinkTimer = null;
-        let aiBusy = false;
-        let animationId = null;
-        let resizeTimeout = null;
-
-        // Stats for win modal
-        let gameStats = {
-            left: { correct: 0, wrong: 0, avgTime: 0, totalTime: 0 },
-            right: { correct: 0, wrong: 0, avgTime: 0, totalTime: 0 }
-        };
-
-        function resizeCanvas() {
-            canvas.width = canvas.clientWidth;
-            canvas.height = canvas.clientHeight;
-        }
-        window.addEventListener("resize", () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(resizeCanvas, 100);
-        });
-        resizeCanvas();
-
-        /* --- MATH ENGINE (balanced for average players) --- */
-        function generateQuestion() {
-            let a, b, correct, op;
-            const random = Math.random();
-
-            switch (difficulty) {
-                case "easy":
-                    // Mostly addition and subtraction, simple numbers
-                    if (random < 0.5) {
-                        op = "+";
-                        a = Math.floor(Math.random() * 15) + 1;
-                        b = Math.floor(Math.random() * 15) + 1;
-                        correct = a + b;
-                    } else {
-                        op = "-";
-                        a = Math.floor(Math.random() * 20) + 10;
-                        b = Math.floor(Math.random() * a) + 1;
-                        correct = a - b;
-                    }
-                    break;
-                case "medium":
-                    // Mix of all operations with moderate numbers
-                    if (random < 0.35) {
-                        op = "+";
-                        a = Math.floor(Math.random() * 25) + 1;
-                        b = Math.floor(Math.random() * 25) + 1;
-                        correct = a + b;
-                    } else if (random < 0.65) {
-                        op = "-";
-                        a = Math.floor(Math.random() * 40) + 1;
-                        b = Math.floor(Math.random() * a) + 1;
-                        correct = a - b;
-                    } else if (random < 0.85) {
-                        op = "*";
-                        a = Math.floor(Math.random() * 10) + 1;
-                        b = Math.floor(Math.random() * 10) + 1;
-                        correct = a * b;
-                    } else {
-                        op = "/";
-                        b = Math.floor(Math.random() * 10) + 1;
-                        correct = Math.floor(Math.random() * 10) + 1;
-                        a = b * correct;
-                    }
-                    break;
-                case "hard":
-                    // All operations, slightly larger numbers
-                    if (random < 0.30) {
-                        op = "+";
-                        a = Math.floor(Math.random() * 40) + 1;
-                        b = Math.floor(Math.random() * 40) + 1;
-                        correct = a + b;
-                    } else if (random < 0.60) {
-                        op = "-";
-                        a = Math.floor(Math.random() * 60) + 1;
-                        b = Math.floor(Math.random() * a) + 1;
-                        correct = a - b;
-                    } else if (random < 0.80) {
-                        op = "*";
-                        a = Math.floor(Math.random() * 12) + 1;
-                        b = Math.floor(Math.random() * 12) + 1;
-                        correct = a * b;
-                    } else {
-                        op = "/";
-                        b = Math.floor(Math.random() * 12) + 1;
-                        correct = Math.floor(Math.random() * 12) + 1;
-                        a = b * correct;
-                    }
-                    break;
-                default:
-                    op = "+";
-                    a = Math.floor(Math.random() * 20) + 1;
-                    b = Math.floor(Math.random() * 20) + 1;
-                    correct = a + b;
-            }
-
-            const options = new Set([correct]);
-            let attempts = 0;
-            while (options.size < 4 && attempts < 100) {
-                let offset = Math.floor(Math.random() * 8) - 4;
-                // Avoid zero offset for wrong answers
-                if (offset === 0) offset = (Math.random() < 0.5) ? 1 : -1;
-                const wrong = correct + offset;
-                if (wrong !== correct && wrong >= -20 && wrong <= 100) {
-                    options.add(wrong);
-                }
-                attempts++;
-            }
-            const opSymbol = op === '*' ? '×' : op === '/' ? '÷' : op;
-            return {
-                q: `${a} ${opSymbol} ${b}`,
-                correct,
-                options: Array.from(options).sort(() => Math.random() - 0.5)
-            };
-        }
-
-        /* --- GAME ACTIONS --- */
-        function submitAnswer(side, val, startTime) {
-            if (!gameRunning) return;
-            const q = side === "left" ? leftQ : rightQ;
-            const timeTaken = startTime ? (Date.now() - startTime) / 1000 : 0;
-
-            // Prevent AI from answering twice
-            if (side === "right" && aiBusy) return;
-            if (side === "right") aiBusy = true;
-
-            if (val === q.correct) {
-                pullOffset = side === "left" ? -15 : 15;
-                ropePosition += pullOffset;
-                if (side === "left") {
-                    if (leftLives < MAX_LIVES) leftLives++;
-                    leftScore++;
-                    leftStreak++;
-                    gameStats.left.correct++;
-                    gameStats.left.totalTime += timeTaken;
-                } else {
-                    if (rightLives < MAX_LIVES) rightLives++;
-                    rightScore++;
-                    rightStreak++;
-                    gameStats.right.correct++;
-                    gameStats.right.totalTime += timeTaken;
-                }
-            } else {
-                if (side === "left") {
-                    leftLives--;
-                    leftStreak = 0;
-                    gameStats.left.wrong++;
-                } else {
-                    rightLives--;
-                    rightStreak = 0;
-                    gameStats.right.wrong++;
-                }
-                triggerShake(side + "Panel");
-            }
-            updateUI();
-            if (!checkWin()) {
-                setTimeout(() => pullOffset = 0, 100);
-                newQuestions();
-            } else {
-                if (aiThinkTimer) { clearTimeout(aiThinkTimer);
-                    aiThinkTimer = null; }
-                aiBusy = false;
-            }
-            if (side === "right") {
-                setTimeout(() => { aiBusy = false; }, 200);
-            }
-        }
-
-        /* --- AI LOGIC (balanced for average players) --- */
-        function aiTurn() {
-            if (!gameRunning || aiBusy) return;
-            const q = rightQ;
-            if (!q) return;
-
-            const correct = q.correct;
-            let aiAnswer;
-
-            // Balanced accuracy for average players
-            let accuracy = 1.0;
-            if (difficulty === "easy") accuracy = 0.55;
-            else if (difficulty === "medium") accuracy = 0.70;
-            else accuracy = 0.85;
-
-            if (Math.random() < accuracy) {
-                aiAnswer = correct;
-            } else {
-                const wrongOptions = q.options.filter(o => o !== correct);
-                if (wrongOptions.length > 0) {
-                    aiAnswer = wrongOptions[Math.floor(Math.random() * wrongOptions.length)];
-                } else {
-                    aiAnswer = correct + (Math.random() < 0.5 ? 1 : -1);
-                }
-            }
-
-            // Balanced response times for average players
-            let delay = 0;
-            if (difficulty === "easy") delay = 900 + Math.random() * 1000;
-            else if (difficulty === "medium") delay = 500 + Math.random() * 700;
-            else delay = 300 + Math.random() * 500;
-
-            if (aiThinkTimer) clearTimeout(aiThinkTimer);
-            aiThinkTimer = setTimeout(() => {
-                if (!gameRunning) return;
-                const btns = document.querySelectorAll('#rightOptions .option-btn');
-                for (let btn of btns) {
-                    if (parseInt(btn.textContent) === aiAnswer) {
-                        btn.click();
-                        return;
-                    }
-                }
-                if (btns.length > 0) btns[0].click();
-            }, delay);
-        }
-
-        function checkWin() {
-            let winner = "";
-            if (ropePosition <= -150 || rightLives <= 0) winner = "left";
-            else if (ropePosition >= 150 || leftLives <= 0) winner = "right";
-
-            if (winner) {
-                gameRunning = false;
-                clearInterval(timerInterval);
-                if (aiThinkTimer) { 
-                    clearTimeout(aiThinkTimer);
-                    aiThinkTimer = null; 
-                }
-                aiBusy = false;
-                if (animationId) {
-                    cancelAnimationFrame(animationId);
-                    animationId = null;
-                }
-                calculateStats();
-                showCelebration(winner);
-                return true;
-            }
-            return false;
-        }
-
-        function calculateStats() {
-            gameStats.left.avgTime = gameStats.left.correct > 0 ?
-                (gameStats.left.totalTime / gameStats.left.correct).toFixed(2) : 0;
-            gameStats.right.avgTime = gameStats.right.correct > 0 ?
-                (gameStats.right.totalTime / gameStats.right.correct).toFixed(2) : 0;
-        }
-
-        function showCelebration(winner) {
-            const winnerName = winner === "left" ? leftPlayerName : rightPlayerName;
-            const winnerColor = winner === "left" ? leftPlayerColor : rightPlayerColor;
-            celebrationText.textContent = `🏆 ${winnerName} WINS! 🏆`;
-            celebrationText.style.color = winnerColor;
-            celebrationSubtext.textContent = `Incredible Pulling Power in ${seconds}s!`;
-            celebration.style.display = "flex";
-            setTimeout(() => {
-                celebration.style.display = "none";
-                showWinModal(winner);
-            }, 3000);
-        }
-
-        function showWinModal(winner) {
-            const winnerName = winner === "left" ? leftPlayerName : rightPlayerName;
-            const loserName = winner === "left" ? rightPlayerName : leftPlayerName;
-            const winnerScore = winner === "left" ? leftScore : rightScore;
-            const loserScore = winner === "left" ? rightScore : leftScore;
-            const winnerLives = winner === "left" ? leftLives : rightLives;
-            const loserLives = winner === "left" ? rightLives : leftLives;
-            const winnerStats = winner === "left" ? gameStats.left : gameStats.right;
-            const loserStats = winner === "left" ? gameStats.right : gameStats.left;
-
-            document.getElementById("winText").textContent = `🎉 ${winnerName} Wins! 🎉`;
-            document.getElementById("statsContainer").innerHTML = `
-                    <div class="stat-item"><span class="label">${winnerName} Score:</span><span class="value">${winnerScore}</span></div>
-                    <div class="stat-item"><span class="label">${loserName} Score:</span><span class="value">${loserScore}</span></div>
-                    <div class="stat-item"><span class="label">${winnerName} Lives Remaining:</span><span class="value">${winnerLives} ❤️</span></div>
-                    <div class="stat-item"><span class="label">${loserName} Lives Remaining:</span><span class="value">${loserLives} ❤️</span></div>
-                    <div class="stat-item"><span class="label">${winnerName} Correct:</span><span class="value">${winnerStats.correct}</span></div>
-                    <div class="stat-item"><span class="label">${winnerName} Wrong:</span><span class="value">${winnerStats.wrong}</span></div>
-                    <div class="stat-item"><span class="label">${winnerName} Avg Response:</span><span class="value">${winnerStats.avgTime}s</span></div>
-                    <div class="stat-item"><span class="label">${loserName} Avg Response:</span><span class="value">${loserStats.avgTime}s</span></div>
-                    <div class="stat-item"><span class="label">Total Game Time:</span><span class="value">${seconds}s</span></div>
-                    <div class="stat-item" style="border-bottom:none;padding-top:10px;font-size:14px;color:#636e72;">
-                        <span class="label">AI Difficulty:</span>
-                        <span class="value" style="text-transform:capitalize;">${difficulty}</span>
+                <div class="player-name-inputs">
+                    <div class="input-group">
+                        <label for="leftNameInput">Your Name</label>
+                        <input type="text" id="leftNameInput" placeholder="Enter name..." value="You" maxlength="15">
+                        <div class="color-picker">
+                            <label>Color:</label>
+                            <input type="color" id="leftColor" value="#e74c3c">
+                        </div>
                     </div>
-                `;
-            document.getElementById("winModal").classList.add("active");
-        }
+                    <div class="input-group">
+                        <label>🤖 AI Opponent</label>
+                        <input type="text" id="rightNameInput" placeholder="AI name" value="AI" maxlength="15" disabled>
+                        <div class="color-picker">
+                            <label>Color:</label>
+                            <input type="color" id="rightColor" value="#3498db" disabled>
+                        </div>
+                    </div>
+                </div>
 
-        /* --- RENDERING --- */
-        function draw() {
-            if (!gameRunning && celebration.style.display === "none") {
-                if (animationId) {
-                    cancelAnimationFrame(animationId);
-                    animationId = null;
-                }
-                return;
-            }
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const centerY = canvas.height / 2;
-            const ropeX = (canvas.width / 2) + ropePosition + (pullOffset * 0.5);
+                <div class="game-settings">
+                    <div class="setting-group">
+                        <label>AI Difficulty:</label>
+                        <select id="difficultySelect">
+                            <option value="easy">Easy</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label>Starting Lives:</label>
+                        <select id="livesSelect">
+                            <option value="3">3</option>
+                            <option value="5" selected>5</option>
+                            <option value="7">7</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                </div>
 
-            const gradient = ctx.createLinearGradient(0, 0, 0, centerY + 50);
-            gradient.addColorStop(0, "#87ceeb");
-            gradient.addColorStop(0.7, "#e8f5ff");
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, centerY + 50);
+                <ul class="rules-list">
+                    <li>✅ <b>Correct:</b> Pull rope + Gain 1 Life (❤️)</li>
+                    <li>❌ <b>Wrong:</b> Lose 1 Life</li>
+                    <li>🎯 <b>Goal:</b> Pull the AI or outlast them</li>
+                </ul>
+                <button id="startBtn">🚀 START GAME</button>
+            </div>
+            <canvas id="gameCanvas" aria-label="Tug of war game canvas showing rope position between player and AI"></canvas>
+        </div>
 
-            ctx.fillStyle = "#5cb85c";
-            ctx.fillRect(0, centerY + 50, canvas.width, canvas.height - centerY - 50);
-            ctx.fillStyle = "#4CAF50";
-            for (let i = 0; i < canvas.width; i += 20) {
-                ctx.fillRect(i, centerY + 47, 2, 6);
-            }
+        <!-- AI (RIGHT) -->
+        <div class="quiz-panel" id="rightPanel">
+            <h2 id="rightPlayerName">AI</h2>
+            <div class="lives" id="rightLives">❤️❤️❤️❤️❤️</div>
+            <div class="score-display" id="rightScore">Score: 0</div>
+            <div class="streak-display" id="rightStreak">🔥 Streak: 0</div>
+            <div class="question" id="rightQuestion">Ready?</div>
+            <div class="options" id="rightOptions"></div>
+        </div>
+    </div>
+</main>
 
-            ctx.fillStyle = "rgba(0,0,0,0.1)";
-            ctx.beginPath();
-            ctx.ellipse(ropeX - 140, centerY + 65, 30, 10, 0, 0, Math.PI * 2);
-            ctx.ellipse(ropeX + 140, centerY + 65, 30, 10, 0, 0, Math.PI * 2);
-            ctx.fill();
+<div class="modal" id="winModal">
+    <div class="modal-box">
+        <h2 id="winText">Winner Result</h2>
+        <div id="statsContainer"></div>
+        <button onclick="closeModal()">🔄 Play Again</button>
+    </div>
+</div>
 
-            ctx.fillStyle = "rgba(255,255,255,0.3)";
-            ctx.beginPath();
-            ctx.arc(canvas.width / 2, centerY + 15, 20, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = "rgba(255,255,255,0.5)";
-            ctx.font = "20px Arial";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText("⚔️", canvas.width / 2, centerY + 15);
+<footer class="game-footer">
+    <div class="footer-content">
+        <span>Built by </span>
+        <a href="https://agunechemba.name.ng" target="_blank" class="footer-link">Agunechemba Ekene</a>
+    </div>
+</footer>
 
-            const ropeGradient = ctx.createLinearGradient(ropeX - 220, 0, ropeX + 220, 0);
-            ropeGradient.addColorStop(0, "#8d6e63");
-            ropeGradient.addColorStop(0.3, "#a1887f");
-            ropeGradient.addColorStop(0.5, "#8d6e63");
-            ropeGradient.addColorStop(0.7, "#a1887f");
-            ropeGradient.addColorStop(1, "#8d6e63");
-            ctx.lineWidth = 10;
-            ctx.strokeStyle = ropeGradient;
-            ctx.lineCap = "round";
-            ctx.beginPath();
-            ctx.moveTo(ropeX - 220, centerY + 15);
-            ctx.lineTo(ropeX + 220, centerY + 15);
-            ctx.stroke();
-
-            ctx.strokeStyle = "rgba(139, 69, 19, 0.3)";
-            ctx.lineWidth = 1;
-            for (let i = -200; i <= 200; i += 15) {
-                ctx.beginPath();
-                ctx.moveTo(ropeX + i, centerY + 10);
-                ctx.lineTo(ropeX + i + 5, centerY + 20);
-                ctx.stroke();
-            }
-
-            drawPlayer(ropeX - 140, centerY + 15, true);
-            drawPlayer(ropeX + 140, centerY + 15, false);
-            animationId = requestAnimationFrame(draw);
-        }
-
-        function drawPlayer(x, y, isLeft) {
-            const skin = "#ffdbac";
-            const hair = isLeft ? "#4b2c20" : "#f1c40f";
-            const pullSide = isLeft ? 1 : -1;
-            const color = isLeft ? leftPlayerColor : rightPlayerColor;
-            const name = isLeft ? leftPlayerName : rightPlayerName;
-
-            ctx.fillStyle = color;
-            ctx.shadowColor = "rgba(0,0,0,0.2)";
-            ctx.shadowBlur = 10;
-            ctx.shadowOffsetY = 5;
-            ctx.beginPath();
-            ctx.roundRect(x - 20, y - 45, 40, 65, 10);
-            ctx.fill();
-            ctx.shadowBlur = 0;
-            ctx.shadowOffsetY = 0;
-
-            ctx.fillStyle = skin;
-            ctx.beginPath();
-            ctx.arc(x, y - 70, 22, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = hair;
-            ctx.beginPath();
-            ctx.arc(x, y - 78, 23, Math.PI, 0);
-            ctx.fill();
-
-            ctx.fillStyle = "#333";
-            ctx.beginPath();
-            ctx.arc(x - 7, y - 72, 2.5, 0, Math.PI * 2);
-            ctx.arc(x + 7, y - 72, 2.5, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.strokeStyle = "#333";
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.arc(x, y - 62, 5, 0.5, Math.PI - 0.5);
-            ctx.stroke();
-
-            ctx.strokeStyle = skin;
-            ctx.lineWidth = 10;
-            ctx.lineCap = "round";
-            ctx.beginPath();
-            ctx.moveTo(x + (pullSide * 5), y - 20);
-            ctx.lineTo(x + (pullSide * 50), y);
-            ctx.stroke();
-
-            ctx.fillStyle = "#2c3e50";
-            ctx.fillRect(x - 16, y + 20, 12, 45);
-            ctx.fillRect(x + 4, y + 20, 12, 45);
-
-            ctx.fillStyle = "rgba(0,0,0,0.7)";
-            ctx.shadowBlur = 0;
-            ctx.font = "bold 14px Arial";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "bottom";
-            ctx.fillText(name, x, y - 95);
-
-            const lives = isLeft ? leftLives : rightLives;
-            ctx.font = "12px Arial";
-            ctx.textBaseline = "top";
-            ctx.fillText("❤️".repeat(Math.min(lives, 5)), x, y + 70);
-        }
-
-        /* --- UTILS --- */
-        function updateUI() {
-            document.getElementById("leftLives").textContent = "❤️".repeat(Math.min(leftLives, 10));
-            document.getElementById("rightLives").textContent = "❤️".repeat(Math.min(rightLives, 10));
-            document.getElementById("leftScore").textContent = `Score: ${leftScore}`;
-            document.getElementById("rightScore").textContent = `Score: ${rightScore}`;
-            document.getElementById("leftStreak").textContent = `🔥 Streak: ${leftStreak}`;
-            document.getElementById("rightStreak").textContent = `🔥 Streak: ${rightStreak}`;
-        }
-
-        function triggerShake(id) {
-            const p = document.getElementById(id);
-            p.classList.add("shake");
-            setTimeout(() => p.classList.remove("shake"), 400);
-        }
-
-        function newQuestions() {
-            leftQ = generateQuestion();
-            rightQ = generateQuestion();
-            document.getElementById("leftQuestion").textContent = leftQ.q;
-            document.getElementById("rightQuestion").textContent = rightQ.q;
-            renderOptions("leftOptions", leftQ, "left");
-            renderOptions("rightOptions", rightQ, "right");
-
-            if (gameRunning) {
-                if (aiThinkTimer) clearTimeout(aiThinkTimer);
-                aiThinkTimer = setTimeout(() => {
-                    if (gameRunning) aiTurn();
-                }, 400);
-            }
-        }
-
-        function renderOptions(id, obj, side) {
-            const c = document.getElementById(id);
-            c.innerHTML = "";
-            obj.options.forEach(o => {
-                const b = document.createElement("button");
-                b.className = `option-btn ${side}-option`;
-                b.textContent = o;
-                const startTime = Date.now();
-                b.onclick = () => {
-                    if (side === "left") {
-                        submitAnswer(side, o, startTime);
-                    } else {
-                        submitAnswer(side, o, startTime);
-                    }
-                };
-                c.appendChild(b);
-            });
-        }
-
-        /* --- START / RESET --- */
-        document.getElementById("startBtn").onclick = () => {
-            leftPlayerName = document.getElementById("leftNameInput").value.trim() || "You";
-            rightPlayerName = "AI";
-            leftPlayerColor = document.getElementById("leftColor").value;
-            rightPlayerColor = "#3498db";
-            difficulty = document.getElementById("difficultySelect").value;
-            startingLives = parseInt(document.getElementById("livesSelect").value);
-
-            document.getElementById("leftPlayerName").textContent = leftPlayerName;
-            document.getElementById("rightPlayerName").textContent = rightPlayerName;
-            document.getElementById("leftPanel").style.borderColor = leftPlayerColor;
-            document.getElementById("rightPanel").style.borderColor = "#3498db";
-
-            welcomeBox.style.display = "none";
-            gameRunning = true;
-            aiBusy = false;
-            leftLives = startingLives;
-            rightLives = startingLives;
-            leftScore = 0;
-            rightScore = 0;
-            leftStreak = 0;
-            rightStreak = 0;
-            ropePosition = 0;
-            seconds = 0;
-            gameStats = {
-                left: { correct: 0, wrong: 0, avgTime: 0, totalTime: 0 },
-                right: { correct: 0, wrong: 0, avgTime: 0, totalTime: 0 }
-            };
-            updateUI();
-            newQuestions();
-            if (animationId) {
-                cancelAnimationFrame(animationId);
-                animationId = null;
-            }
-            draw();
-
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                seconds++;
-                document.getElementById("timer").textContent = `⏱️ Time: ${seconds}s`;
-            }, 1000);
-        };
-
-        function closeModal() {
-            document.getElementById("winModal").classList.remove("active");
-            welcomeBox.style.display = "block";
-            document.getElementById("timer").textContent = "⏱️ Time: 0s";
-            document.getElementById("leftPanel").style.borderColor = "transparent";
-            document.getElementById("rightPanel").style.borderColor = "transparent";
-            if (aiThinkTimer) { clearTimeout(aiThinkTimer);
-                aiThinkTimer = null; }
-            aiBusy = false;
-            if (animationId) {
-                cancelAnimationFrame(animationId);
-                animationId = null;
-            }
-        }
-
-        // Polyfill for roundRect
-        if (!CanvasRenderingContext2D.prototype.roundRect) {
-            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
-                if (r > w / 2) r = w / 2;
-                if (r > h / 2) r = h / 2;
-                this.moveTo(x + r, y);
-                this.lineTo(x + w - r, y);
-                this.quadraticCurveTo(x + w, y, x + w, y + r);
-                this.lineTo(x + w, y + h - r);
-                this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-                this.lineTo(x + r, y + h);
-                this.quadraticCurveTo(x, y + h, x, y + h - r);
-                this.lineTo(x, y + r);
-                this.quadraticCurveTo(x, y, x + r, y);
-                return this;
-            };
-        }
-
-        draw();
-    </script>
+<script src="script.js"></script>
 </body>
 </html>

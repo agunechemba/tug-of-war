@@ -1,3 +1,9 @@
+// ============================================
+// SHARED GAME ENGINE - Tug of War
+// Supports both 2-player and vs AI modes
+// ============================================
+
+// --- DOM REFERENCES ---
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const welcomeBox = document.getElementById("welcomeBox");
@@ -5,7 +11,8 @@ const celebration = document.getElementById("celebration");
 const celebrationText = document.getElementById("celebrationText");
 const celebrationSubtext = document.getElementById("celebrationSubtext");
 
-let ropePosition = 0; 
+// --- GAME STATE ---
+let ropePosition = 0;
 let pullOffset = 0;
 let seconds = 0;
 let gameRunning = false;
@@ -17,7 +24,13 @@ let timerInterval, leftQ, rightQ;
 let animationId = null;
 let resizeTimeout = null;
 
-// Player settings
+// --- VISUAL EFFECTS ---
+let leftPullStrength = 0;
+let rightPullStrength = 0;
+let shakeAmount = 0;
+let particles = [];
+
+// --- PLAYER SETTINGS ---
 let leftPlayerName = "Player 1";
 let rightPlayerName = "Player 2";
 let leftPlayerColor = "#e74c3c";
@@ -25,30 +38,44 @@ let rightPlayerColor = "#3498db";
 let difficulty = "medium";
 let startingLives = 5;
 
-// Stats for win modal
+// --- MODE DETECTION ---
+const isAIMode = window.location.pathname.includes('playWithAI.html');
+
+// --- AI STATE (only used in AI mode) ---
+let aiThinkTimer = null;
+let aiBusy = false;
+
+// --- STATS ---
 let gameStats = {
     left: { correct: 0, wrong: 0, avgTime: 0, totalTime: 0 },
     right: { correct: 0, wrong: 0, avgTime: 0, totalTime: 0 }
 };
 
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+
 function resizeCanvas() {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
 }
+
 window.addEventListener("resize", () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(resizeCanvas, 100);
 });
 resizeCanvas();
 
-/* --- MATH ENGINE WITH UPDATED DIFFICULTY --- */
+// ============================================
+// MATH ENGINE
+// ============================================
+
 function generateQuestion() {
     let a, b, correct, op;
     const random = Math.random();
 
     switch(difficulty) {
         case "easy":
-            // Easy: Only addition, subtraction, and multiplication
             const easyOps = ["+", "-", "*"];
             op = easyOps[Math.floor(Math.random() * easyOps.length)];
             
@@ -58,9 +85,9 @@ function generateQuestion() {
                 correct = a + b;
             } else if (op === "-") {
                 a = Math.floor(Math.random() * 30) + 1;
-                b = Math.floor(Math.random() * a) + 1; // Ensure positive result
+                b = Math.floor(Math.random() * a) + 1;
                 correct = a - b;
-            } else { // multiplication
+            } else {
                 a = Math.floor(Math.random() * 12) + 1;
                 b = Math.floor(Math.random() * 12) + 1;
                 correct = a * b;
@@ -68,27 +95,22 @@ function generateQuestion() {
             break;
 
         case "medium":
-            // Medium: 70% division, 15% multiplication, 8% subtraction, 7% addition
             if (random < 0.70) {
-                // Division (70%)
                 op = "/";
                 b = Math.floor(Math.random() * 12) + 1;
                 correct = Math.floor(Math.random() * 12) + 1;
                 a = b * correct;
             } else if (random < 0.85) {
-                // Multiplication (15%)
                 op = "*";
                 a = Math.floor(Math.random() * 12) + 1;
                 b = Math.floor(Math.random() * 12) + 1;
                 correct = a * b;
             } else if (random < 0.93) {
-                // Subtraction (8%)
                 op = "-";
                 a = Math.floor(Math.random() * 50) + 1;
                 b = Math.floor(Math.random() * a) + 1;
                 correct = a - b;
             } else {
-                // Addition (7%)
                 op = "+";
                 a = Math.floor(Math.random() * 30) + 1;
                 b = Math.floor(Math.random() * 30) + 1;
@@ -97,9 +119,7 @@ function generateQuestion() {
             break;
 
         case "hard":
-            // Hard: 50% operations with negative numbers, 25% division, 25% multiplication
             if (random < 0.50) {
-                // 50% Operations with negative numbers (mixed)
                 const negativeOps = ["+", "-", "*", "/"];
                 op = negativeOps[Math.floor(Math.random() * negativeOps.length)];
                 
@@ -115,21 +135,18 @@ function generateQuestion() {
                     a = Math.floor(Math.random() * 12) - 6;
                     b = Math.floor(Math.random() * 12) - 6;
                     correct = a * b;
-                } else { // division
+                } else {
                     b = Math.floor(Math.random() * 12) - 6;
-                    // Avoid division by zero
                     while (b === 0) b = Math.floor(Math.random() * 12) - 6;
                     correct = Math.floor(Math.random() * 12) - 6;
                     a = b * correct;
                 }
             } else if (random < 0.75) {
-                // 25% Division
                 op = "/";
                 b = Math.floor(Math.random() * 15) + 1;
                 correct = Math.floor(Math.random() * 15) + 1;
                 a = b * correct;
             } else {
-                // 25% Multiplication
                 op = "*";
                 a = Math.floor(Math.random() * 15) + 1;
                 b = Math.floor(Math.random() * 15) + 1;
@@ -138,20 +155,17 @@ function generateQuestion() {
             break;
 
         default:
-            // Fallback to medium
             op = "+";
             a = Math.floor(Math.random() * 20) + 1;
             b = Math.floor(Math.random() * 20) + 1;
             correct = a + b;
     }
 
-    // Generate options
     const options = new Set([correct]);
     let attempts = 0;
     while (options.size < 4 && attempts < 100) {
         let offset;
         if (difficulty === "hard" && Math.random() < 0.3) {
-            // For hard, allow negative wrong answers
             offset = Math.floor(Math.random() * 20) - 10;
         } else {
             offset = Math.floor(Math.random() * 10) - 5;
@@ -171,15 +185,65 @@ function generateQuestion() {
     };
 }
 
-/* --- GAME ACTIONS --- */
+// ============================================
+// PARTICLE SYSTEM
+// ============================================
+
+function spawnParticles(x, y, color, count) {
+    for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 8 + 2;
+        particles.push({
+            x: x,
+            y: y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 3,
+            life: 1,
+            decay: Math.random() * 0.02 + 0.01,
+            color: color,
+            size: Math.random() * 6 + 3
+        });
+    }
+}
+
+function updateParticles() {
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.2;
+        p.life -= p.decay;
+        if (p.life <= 0) {
+            particles.splice(i, 1);
+        }
+    }
+}
+
+// ============================================
+// GAME ACTIONS
+// ============================================
+
 function submitAnswer(side, val, startTime) {
     if (!gameRunning) return;
     const q = side === "left" ? leftQ : rightQ;
     const timeTaken = startTime ? (Date.now() - startTime) / 1000 : 0;
 
+    // Prevent AI from answering twice
+    if (isAIMode && side === "right" && aiBusy) return;
+    if (isAIMode && side === "right") aiBusy = true;
+
     if (val === q.correct) {
-        pullOffset = side === "left" ? -15 : 15;
+        const pullAmount = 25;
+        pullOffset = side === "left" ? -pullAmount : pullAmount;
         ropePosition += pullOffset;
+        
+        if (side === "left") {
+            leftPullStrength = 1;
+            spawnParticles(canvas.width / 2 - 100, canvas.height / 2, leftPlayerColor, 20);
+        } else {
+            rightPullStrength = 1;
+            spawnParticles(canvas.width / 2 + 100, canvas.height / 2, rightPlayerColor, 20);
+        }
         
         if (side === "left") {
             if (leftLives < MAX_LIVES) leftLives++;
@@ -195,24 +259,89 @@ function submitAnswer(side, val, startTime) {
             gameStats.right.totalTime += timeTaken;
         }
     } else {
+        shakeAmount = 15;
         if (side === "left") {
             leftLives--;
             leftStreak = 0;
             gameStats.left.wrong++;
+            spawnParticles(canvas.width / 2 - 100, canvas.height / 2, "#ff0000", 10);
         } else {
             rightLives--;
             rightStreak = 0;
             gameStats.right.wrong++;
+            spawnParticles(canvas.width / 2 + 100, canvas.height / 2, "#ff0000", 10);
         }
         triggerShake(side + "Panel");
     }
 
     updateUI();
     if (!checkWin()) {
-        setTimeout(() => pullOffset = 0, 100);
+        setTimeout(() => {
+            pullOffset = 0;
+        }, 150);
         newQuestions();
+    } else {
+        if (isAIMode && aiThinkTimer) { 
+            clearTimeout(aiThinkTimer);
+            aiThinkTimer = null; 
+        }
+        if (isAIMode) aiBusy = false;
+    }
+    if (isAIMode && side === "right") {
+        setTimeout(() => { aiBusy = false; }, 200);
     }
 }
+
+// ============================================
+// AI LOGIC (only used in AI mode)
+// ============================================
+
+function aiTurn() {
+    if (!isAIMode || !gameRunning || aiBusy) return;
+    const q = rightQ;
+    if (!q) return;
+
+    const correct = q.correct;
+    let aiAnswer;
+
+    let accuracy = 1.0;
+    if (difficulty === "easy") accuracy = 0.55;
+    else if (difficulty === "medium") accuracy = 0.70;
+    else accuracy = 0.85;
+
+    if (Math.random() < accuracy) {
+        aiAnswer = correct;
+    } else {
+        const wrongOptions = q.options.filter(o => o !== correct);
+        if (wrongOptions.length > 0) {
+            aiAnswer = wrongOptions[Math.floor(Math.random() * wrongOptions.length)];
+        } else {
+            aiAnswer = correct + (Math.random() < 0.5 ? 1 : -1);
+        }
+    }
+
+    let delay = 0;
+    if (difficulty === "easy") delay = 900 + Math.random() * 1000;
+    else if (difficulty === "medium") delay = 500 + Math.random() * 700;
+    else delay = 300 + Math.random() * 500;
+
+    if (aiThinkTimer) clearTimeout(aiThinkTimer);
+    aiThinkTimer = setTimeout(() => {
+        if (!gameRunning) return;
+        const btns = document.querySelectorAll('#rightOptions .option-btn');
+        for (let btn of btns) {
+            if (parseInt(btn.textContent) === aiAnswer) {
+                btn.click();
+                return;
+            }
+        }
+        if (btns.length > 0) btns[0].click();
+    }, delay);
+}
+
+// ============================================
+// WIN/LOSE CONDITIONS
+// ============================================
 
 function checkWin() {
     let winner = "";
@@ -222,6 +351,11 @@ function checkWin() {
     if (winner) {
         gameRunning = false;
         clearInterval(timerInterval);
+        if (isAIMode && aiThinkTimer) { 
+            clearTimeout(aiThinkTimer);
+            aiThinkTimer = null; 
+        }
+        if (isAIMode) aiBusy = false;
         if (animationId) {
             cancelAnimationFrame(animationId);
             animationId = null;
@@ -249,10 +383,21 @@ function showCelebration(winner) {
     celebrationSubtext.textContent = `Incredible Pulling Power in ${seconds}s!`;
     celebration.style.display = "flex";
     
+    for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+            spawnParticles(
+                Math.random() * canvas.width,
+                Math.random() * canvas.height * 0.5,
+                winnerColor,
+                30
+            );
+        }, i * 300);
+    }
+    
     setTimeout(() => {
         celebration.style.display = "none";
         showWinModal(winner);
-    }, 3000);
+    }, 4000);
 }
 
 function showWinModal(winner) {
@@ -267,7 +412,7 @@ function showWinModal(winner) {
     
     document.getElementById("winText").textContent = `🎉 ${winnerName} Wins! 🎉`;
     
-    document.getElementById("statsContainer").innerHTML = `
+    let statsHTML = `
         <div class="stat-item">
             <span class="label">${winnerName} Score:</span>
             <span class="value">${winnerScore}</span>
@@ -310,10 +455,23 @@ function showWinModal(winner) {
         </div>
     `;
     
+    if (isAIMode) {
+        statsHTML += `
+            <div class="stat-item" style="border-bottom: none; padding-top: 5px; font-size: 14px; color: #636e72;">
+                <span class="label">Mode:</span>
+                <span class="value">🤖 vs AI</span>
+            </div>
+        `;
+    }
+    
+    document.getElementById("statsContainer").innerHTML = statsHTML;
     document.getElementById("winModal").classList.add("active");
 }
 
-/* --- RENDERING --- */
+// ============================================
+// RENDERING ENGINE
+// ============================================
+
 function draw() {
     if (!gameRunning && celebration.style.display === "none") {
         if (animationId) {
@@ -322,10 +480,32 @@ function draw() {
         }
         return;
     }
+    
+    let shakeX = 0, shakeY = 0;
+    if (shakeAmount > 0) {
+        shakeX = (Math.random() - 0.5) * shakeAmount;
+        shakeY = (Math.random() - 0.5) * shakeAmount;
+        shakeAmount *= 0.9;
+        if (shakeAmount < 0.5) shakeAmount = 0;
+    }
+    
+    ctx.save();
+    ctx.translate(shakeX, shakeY);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     const centerY = canvas.height / 2;
-    const ropeX = (canvas.width / 2) + ropePosition + (pullOffset * 0.5);
+    
+    if (leftPullStrength > 0) {
+        leftPullStrength *= 0.95;
+        if (leftPullStrength < 0.01) leftPullStrength = 0;
+    }
+    if (rightPullStrength > 0) {
+        rightPullStrength *= 0.95;
+        if (rightPullStrength < 0.01) rightPullStrength = 0;
+    }
+    
+    const extraPull = (leftPullStrength - rightPullStrength) * 10;
+    const ropeX = (canvas.width / 2) + ropePosition + (pullOffset * 0.5) + extraPull;
 
     // Sky gradient
     const gradient = ctx.createLinearGradient(0, 0, 0, centerY + 50);
@@ -343,6 +523,25 @@ function draw() {
     for (let i = 0; i < canvas.width; i += 20) {
         ctx.fillRect(i, centerY + 47, 2, 6);
     }
+
+    // Win threshold indicators
+    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+    ctx.lineWidth = 3;
+    ctx.setLineDash([10, 10]);
+    ctx.beginPath();
+    ctx.moveTo(canvas.width / 2 - 150, 0);
+    ctx.lineTo(canvas.width / 2 - 150, canvas.height);
+    ctx.moveTo(canvas.width / 2 + 150, 0);
+    ctx.lineTo(canvas.width / 2 + 150, canvas.height);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = "rgba(255, 215, 0, 0.4)";
+    ctx.font = "bold 14px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    ctx.fillText("🏆 WIN ZONE", canvas.width / 2 - 150, 10);
+    ctx.fillText("🏆 WIN ZONE", canvas.width / 2 + 150, 10);
 
     // Shadows
     ctx.fillStyle = "rgba(0,0,0,0.1)";
@@ -366,31 +565,52 @@ function draw() {
     const ropeGradient = ctx.createLinearGradient(ropeX - 220, 0, ropeX + 220, 0);
     ropeGradient.addColorStop(0, "#8d6e63");
     ropeGradient.addColorStop(0.3, "#a1887f");
-    ropeGradient.addColorStop(0.5, "#8d6e63");
+    ropeGradient.addColorStop(0.5, "#d4a373");
     ropeGradient.addColorStop(0.7, "#a1887f");
     ropeGradient.addColorStop(1, "#8d6e63");
     
-    ctx.lineWidth = 10;
+    ctx.lineWidth = 12;
     ctx.strokeStyle = ropeGradient;
     ctx.lineCap = "round";
+    ctx.shadowColor = "rgba(0,0,0,0.2)";
+    ctx.shadowBlur = 10;
     ctx.beginPath();
     ctx.moveTo(ropeX - 220, centerY + 15);
     ctx.lineTo(ropeX + 220, centerY + 15);
     ctx.stroke();
+    ctx.shadowBlur = 0;
 
-    // Rope texture lines
+    // Rope texture
     ctx.strokeStyle = "rgba(139, 69, 19, 0.3)";
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 2;
     for (let i = -200; i <= 200; i += 15) {
         ctx.beginPath();
-        ctx.moveTo(ropeX + i, centerY + 10);
-        ctx.lineTo(ropeX + i + 5, centerY + 20);
+        ctx.moveTo(ropeX + i, centerY + 8);
+        ctx.lineTo(ropeX + i + 8, centerY + 22);
         ctx.stroke();
     }
 
     drawPlayer(ropeX - 140, centerY + 15, true);
     drawPlayer(ropeX + 140, centerY + 15, false);
 
+    updateParticles();
+    for (const p of particles) {
+        ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    const progress = ((ropePosition / 150) * 100).toFixed(0);
+    ctx.fillStyle = "rgba(0,0,0,0.6)";
+    ctx.font = "bold 16px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    ctx.fillText(`⚡ ${Math.abs(progress)}%`, canvas.width / 2, centerY - 30);
+    
+    ctx.restore();
     animationId = requestAnimationFrame(draw);
 }
 
@@ -400,8 +620,13 @@ function drawPlayer(x, y, isLeft) {
     const pullSide = isLeft ? 1 : -1;
     const color = isLeft ? leftPlayerColor : rightPlayerColor;
     const name = isLeft ? leftPlayerName : rightPlayerName;
+    
+    const glow = isLeft ? leftPullStrength : rightPullStrength;
+    if (glow > 0.1) {
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 30 * glow;
+    }
 
-    // Body
     ctx.fillStyle = color;
     ctx.shadowColor = "rgba(0,0,0,0.2)";
     ctx.shadowBlur = 10;
@@ -412,62 +637,65 @@ function drawPlayer(x, y, isLeft) {
     ctx.shadowBlur = 0;
     ctx.shadowOffsetY = 0;
 
-    // Head
     ctx.fillStyle = skin;
     ctx.beginPath();
     ctx.arc(x, y - 70, 22, 0, Math.PI*2);
     ctx.fill();
 
-    // Hair
     ctx.fillStyle = hair;
     ctx.beginPath();
     ctx.arc(x, y - 78, 23, Math.PI, 0);
     ctx.fill();
 
-    // Eyes
+    const eyeOffset = isLeft ? 3 : -3;
     ctx.fillStyle = "#333";
     ctx.beginPath();
-    ctx.arc(x - 7, y - 72, 2.5, 0, Math.PI*2);
-    ctx.arc(x + 7, y - 72, 2.5, 0, Math.PI*2);
+    ctx.arc(x - 7 + eyeOffset, y - 72, 2.5, 0, Math.PI*2);
+    ctx.arc(x + 7 + eyeOffset, y - 72, 2.5, 0, Math.PI*2);
     ctx.fill();
 
-    // Mouth
     ctx.strokeStyle = "#333";
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.arc(x, y - 62, 5, 0.5, Math.PI - 0.5);
+    ctx.arc(x, y - 62, 5, 0.1, Math.PI - 0.1);
     ctx.stroke();
 
-    // Arms
     ctx.strokeStyle = skin;
     ctx.lineWidth = 10;
     ctx.lineCap = "round";
+    const pullAngle = isLeft ? Math.sin(Date.now() / 200) * 0.3 : Math.sin(Date.now() / 200 + 1) * 0.3;
+    const armExtension = isLeft ? 50 + pullAngle * 10 : 50 - pullAngle * 10;
     ctx.beginPath();
     ctx.moveTo(x + (pullSide * 5), y - 20);
-    ctx.lineTo(x + (pullSide * 50), y);
+    ctx.lineTo(x + (pullSide * armExtension), y + pullAngle * 5);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(x + (pullSide * 2), y - 15);
+    ctx.lineTo(x + (pullSide * (armExtension - 10)), y - pullAngle * 5 + 10);
     ctx.stroke();
 
-    // Legs
     ctx.fillStyle = "#2c3e50";
     ctx.fillRect(x - 16, y + 20, 12, 45);
     ctx.fillRect(x + 4, y + 20, 12, 45);
 
-    // Name tag
     ctx.fillStyle = "rgba(0,0,0,0.7)";
     ctx.shadowBlur = 0;
-    ctx.font = "bold 14px Arial";
+    ctx.font = "bold 16px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "bottom";
     ctx.fillText(name, x, y - 95);
 
-    // Lives indicator
     const lives = isLeft ? leftLives : rightLives;
-    ctx.font = "12px Arial";
+    ctx.font = "14px Arial";
     ctx.textBaseline = "top";
     ctx.fillText("❤️".repeat(Math.min(lives, 5)), x, y + 70);
 }
 
-/* --- UTILS --- */
+// ============================================
+// UI UPDATES
+// ============================================
+
 function updateUI() {
     document.getElementById("leftLives").textContent = "❤️".repeat(Math.min(leftLives, 10));
     document.getElementById("rightLives").textContent = "❤️".repeat(Math.min(rightLives, 10));
@@ -490,6 +718,13 @@ function newQuestions() {
     document.getElementById("rightQuestion").textContent = rightQ.q;
     renderOptions("leftOptions", leftQ, "left");
     renderOptions("rightOptions", rightQ, "right");
+
+    if (isAIMode && gameRunning) {
+        if (aiThinkTimer) clearTimeout(aiThinkTimer);
+        aiThinkTimer = setTimeout(() => {
+            if (gameRunning) aiTurn();
+        }, 400);
+    }
 }
 
 function renderOptions(id, obj, side) {
@@ -505,13 +740,28 @@ function renderOptions(id, obj, side) {
     });
 }
 
-/* --- START / RESET --- */
-document.getElementById("startBtn").onclick = () => {
+// ============================================
+// START / RESET
+// ============================================
+
+function startGame() {
+    // Add AI mode class to body for styling
+    if (isAIMode) {
+        document.body.classList.add('ai-mode');
+    }
+    
     // Get player names
     leftPlayerName = document.getElementById("leftNameInput").value.trim() || "Player 1";
-    rightPlayerName = document.getElementById("rightNameInput").value.trim() || "Player 2";
+    
+    if (isAIMode) {
+        rightPlayerName = "AI";
+        rightPlayerColor = "#3498db";
+    } else {
+        rightPlayerName = document.getElementById("rightNameInput").value.trim() || "Player 2";
+        rightPlayerColor = document.getElementById("rightColor").value;
+    }
+    
     leftPlayerColor = document.getElementById("leftColor").value;
-    rightPlayerColor = document.getElementById("rightColor").value;
     difficulty = document.getElementById("difficultySelect").value;
     startingLives = parseInt(document.getElementById("livesSelect").value);
 
@@ -524,6 +774,10 @@ document.getElementById("startBtn").onclick = () => {
     // Reset game state
     welcomeBox.style.display = "none";
     gameRunning = true;
+    if (isAIMode) {
+        aiBusy = false;
+        if (aiThinkTimer) { clearTimeout(aiThinkTimer); aiThinkTimer = null; }
+    }
     leftLives = startingLives;
     rightLives = startingLives;
     leftScore = 0;
@@ -532,6 +786,7 @@ document.getElementById("startBtn").onclick = () => {
     rightStreak = 0;
     ropePosition = 0;
     seconds = 0;
+    particles = [];
     gameStats = {
         left: { correct: 0, wrong: 0, avgTime: 0, totalTime: 0 },
         right: { correct: 0, wrong: 0, avgTime: 0, totalTime: 0 }
@@ -550,21 +805,32 @@ document.getElementById("startBtn").onclick = () => {
         seconds++;
         document.getElementById("timer").textContent = `⏱️ Time: ${seconds}s`;
     }, 1000);
-};
+}
 
 function closeModal() {
+    // Remove AI mode class
+    document.body.classList.remove('ai-mode');
+    
     document.getElementById("winModal").classList.remove("active");
     welcomeBox.style.display = "block";
     document.getElementById("timer").textContent = "⏱️ Time: 0s";
     document.getElementById("leftPanel").style.borderColor = "transparent";
     document.getElementById("rightPanel").style.borderColor = "transparent";
+    if (isAIMode && aiThinkTimer) { 
+        clearTimeout(aiThinkTimer);
+        aiThinkTimer = null; 
+    }
+    if (isAIMode) aiBusy = false;
     if (animationId) {
         cancelAnimationFrame(animationId);
         animationId = null;
     }
 }
 
-// Polyfill for roundRect if needed
+// ============================================
+// POLYFILL & INITIALIZATION
+// ============================================
+
 if (!CanvasRenderingContext2D.prototype.roundRect) {
     CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
         if (r > w/2) r = w/2;
@@ -581,3 +847,7 @@ if (!CanvasRenderingContext2D.prototype.roundRect) {
         return this;
     };
 }
+
+// Initialize event listeners
+document.getElementById("startBtn").onclick = startGame;
+draw();
