@@ -848,6 +848,357 @@ if (!CanvasRenderingContext2D.prototype.roundRect) {
     };
 }
 
+
+
+
+// ============================================
+// SOUND SYSTEM - Lightweight Web Audio API
+// No external files needed!
+// ============================================
+
+class SoundSystem {
+    constructor() {
+        this.audioContext = null;
+        this.enabled = true;
+        this.initAudio();
+    }
+
+    initAudio() {
+        try {
+            // Create audio context on user interaction to avoid browser restrictions
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {
+            console.log('Web Audio API not supported');
+            this.enabled = false;
+        }
+    }
+
+    // Ensure audio context is resumed (needed for Chrome autoplay policy)
+    ensureAudio() {
+        if (!this.enabled) return false;
+        if (this.audioContext && this.audioContext.state === 'suspended') {
+            this.audioContext.resume();
+        }
+        return this.audioContext && this.audioContext.state === 'running';
+    }
+
+    // Play a simple beep/tone
+    playTone(frequency, duration, type = 'sine', volume = 0.3) {
+        if (!this.ensureAudio()) return;
+        
+        try {
+            const oscillator = this.audioContext.createOscillator();
+            const gainNode = this.audioContext.createGain();
+            
+            oscillator.type = type;
+            oscillator.frequency.value = frequency;
+            
+            gainNode.gain.value = volume;
+            gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(this.audioContext.destination);
+            
+            oscillator.start();
+            oscillator.stop(this.audioContext.currentTime + duration);
+        } catch (e) {
+            // Silently fail if sound can't play
+        }
+    }
+
+    // Correct answer sound (happy chime)
+    correct() {
+        this.playTone(523.25, 0.15, 'sine', 0.3); // C5
+        setTimeout(() => {
+            this.playTone(659.25, 0.15, 'sine', 0.3); // E5
+        }, 100);
+        setTimeout(() => {
+            this.playTone(783.99, 0.2, 'sine', 0.3); // G5
+        }, 200);
+    }
+
+    // Wrong answer sound (buzz)
+    wrong() {
+        this.playTone(200, 0.3, 'sawtooth', 0.2);
+        setTimeout(() => {
+            this.playTone(150, 0.3, 'sawtooth', 0.15);
+        }, 150);
+    }
+
+    // Win celebration sound
+    win() {
+        // Ascending happy melody
+        const notes = [523.25, 587.33, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, i) => {
+            setTimeout(() => {
+                this.playTone(freq, 0.2, 'sine', 0.25);
+            }, i * 120);
+        });
+    }
+
+    // Game start sound
+    start() {
+        this.playTone(440, 0.1, 'sine', 0.2);
+        setTimeout(() => {
+            this.playTone(554.37, 0.1, 'sine', 0.2);
+        }, 150);
+        setTimeout(() => {
+            this.playTone(659.25, 0.15, 'sine', 0.25);
+        }, 300);
+    }
+
+    // Pull sound (rope tension)
+    pull() {
+        this.playTone(100, 0.1, 'sawtooth', 0.1);
+    }
+
+    // Life lost sound
+    lifeLost() {
+        this.playTone(300, 0.15, 'square', 0.15);
+        setTimeout(() => {
+            this.playTone(250, 0.2, 'square', 0.15);
+        }, 100);
+    }
+
+    // Toggle sound on/off
+    toggle() {
+        this.enabled = !this.enabled;
+        return this.enabled;
+    }
+}
+
+// Create global sound instance
+const sound = new SoundSystem();
+
+// ============================================
+// Add Sound Toggle Button to UI
+// ============================================
+
+// Add sound toggle to welcome box dynamically
+function addSoundToggle() {
+    const settingsDiv = document.querySelector('.game-settings');
+    if (settingsDiv) {
+        const toggleGroup = document.createElement('div');
+        toggleGroup.className = 'setting-group';
+        toggleGroup.innerHTML = `
+            <label>🔊 Sound:</label>
+            <button id="soundToggle" class="sound-toggle-btn" style="
+                padding: 8px 20px;
+                border: 2px solid #dee2e6;
+                border-radius: 8px;
+                background: white;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 600;
+                transition: all 0.3s;
+            ">ON</button>
+        `;
+        settingsDiv.appendChild(toggleGroup);
+        
+        document.getElementById('soundToggle').addEventListener('click', (e) => {
+            const enabled = sound.toggle();
+            e.target.textContent = enabled ? 'ON' : 'OFF';
+            e.target.style.background = enabled ? 'white' : '#ff4757';
+            e.target.style.color = enabled ? '#2d3436' : 'white';
+        });
+    }
+}
+
+// Call this after DOM is ready
+document.addEventListener('DOMContentLoaded', addSoundToggle);
+
+// ============================================
+// INTEGRATE SOUNDS INTO GAME ACTIONS
+// ============================================
+
+// Modify submitAnswer function to include sounds
+// Replace your existing submitAnswer with this version:
+
+function submitAnswer(side, val, startTime) {
+    if (!gameRunning) return;
+    const q = side === "left" ? leftQ : rightQ;
+    const timeTaken = startTime ? (Date.now() - startTime) / 1000 : 0;
+
+    // Prevent AI from answering twice
+    if (isAIMode && side === "right" && aiBusy) return;
+    if (isAIMode && side === "right") aiBusy = true;
+
+    if (val === q.correct) {
+        // Play correct sound
+        sound.correct();
+        
+        const pullAmount = 25;
+        pullOffset = side === "left" ? -pullAmount : pullAmount;
+        ropePosition += pullOffset;
+        
+        // Play pull sound
+        sound.pull();
+        
+        if (side === "left") {
+            leftPullStrength = 1;
+            spawnParticles(canvas.width / 2 - 100, canvas.height / 2, leftPlayerColor, 20);
+        } else {
+            rightPullStrength = 1;
+            spawnParticles(canvas.width / 2 + 100, canvas.height / 2, rightPlayerColor, 20);
+        }
+        
+        if (side === "left") {
+            if (leftLives < MAX_LIVES) leftLives++;
+            leftScore++;
+            leftStreak++;
+            gameStats.left.correct++;
+            gameStats.left.totalTime += timeTaken;
+        } else {
+            if (rightLives < MAX_LIVES) rightLives++;
+            rightScore++;
+            rightStreak++;
+            gameStats.right.correct++;
+            gameStats.right.totalTime += timeTaken;
+        }
+    } else {
+        // Play wrong sound
+        sound.wrong();
+        
+        shakeAmount = 15;
+        if (side === "left") {
+            leftLives--;
+            leftStreak = 0;
+            gameStats.left.wrong++;
+            spawnParticles(canvas.width / 2 - 100, canvas.height / 2, "#ff0000", 10);
+            // Play life lost sound
+            sound.lifeLost();
+        } else {
+            rightLives--;
+            rightStreak = 0;
+            gameStats.right.wrong++;
+            spawnParticles(canvas.width / 2 + 100, canvas.height / 2, "#ff0000", 10);
+            sound.lifeLost();
+        }
+        triggerShake(side + "Panel");
+    }
+
+    updateUI();
+    if (!checkWin()) {
+        setTimeout(() => {
+            pullOffset = 0;
+        }, 150);
+        newQuestions();
+    } else {
+        if (isAIMode && aiThinkTimer) { 
+            clearTimeout(aiThinkTimer);
+            aiThinkTimer = null; 
+        }
+        if (isAIMode) aiBusy = false;
+    }
+    if (isAIMode && side === "right") {
+        setTimeout(() => { aiBusy = false; }, 200);
+    }
+}
+
+// Modify showCelebration function to include win sound
+// Replace your existing showCelebration with this version:
+
+function showCelebration(winner) {
+    const winnerName = winner === "left" ? leftPlayerName : rightPlayerName;
+    const winnerColor = winner === "left" ? leftPlayerColor : rightPlayerColor;
+    
+    // Play win sound
+    sound.win();
+    
+    celebrationText.textContent = `🏆 ${winnerName} WINS! 🏆`;
+    celebrationText.style.color = winnerColor;
+    celebrationSubtext.textContent = `Incredible Pulling Power in ${seconds}s!`;
+    celebration.style.display = "flex";
+    
+    for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+            spawnParticles(
+                Math.random() * canvas.width,
+                Math.random() * canvas.height * 0.5,
+                winnerColor,
+                30
+            );
+        }, i * 300);
+    }
+    
+    setTimeout(() => {
+        celebration.style.display = "none";
+        showWinModal(winner);
+    }, 4000);
+}
+
+// Modify startGame function to include start sound
+// Add this line to your existing startGame function after game state is reset:
+
+function startGame() {
+    // Add AI mode class to body for styling
+    if (isAIMode) {
+        document.body.classList.add('ai-mode');
+    }
+    
+    // Get player names
+    leftPlayerName = document.getElementById("leftNameInput").value.trim() || "Player 1";
+    
+    if (isAIMode) {
+        rightPlayerName = "AI";
+        rightPlayerColor = "#3498db";
+    } else {
+        rightPlayerName = document.getElementById("rightNameInput").value.trim() || "Player 2";
+        rightPlayerColor = document.getElementById("rightColor").value;
+    }
+    
+    leftPlayerColor = document.getElementById("leftColor").value;
+    difficulty = document.getElementById("difficultySelect").value;
+    startingLives = parseInt(document.getElementById("livesSelect").value);
+
+    // Update UI with names
+    document.getElementById("leftPlayerName").textContent = leftPlayerName;
+    document.getElementById("rightPlayerName").textContent = rightPlayerName;
+    document.getElementById("leftPanel").style.borderColor = leftPlayerColor;
+    document.getElementById("rightPanel").style.borderColor = rightPlayerColor;
+
+    // Reset game state
+    welcomeBox.style.display = "none";
+    gameRunning = true;
+    if (isAIMode) {
+        aiBusy = false;
+        if (aiThinkTimer) { clearTimeout(aiThinkTimer); aiThinkTimer = null; }
+    }
+    leftLives = startingLives;
+    rightLives = startingLives;
+    leftScore = 0;
+    rightScore = 0;
+    leftStreak = 0;
+    rightStreak = 0;
+    ropePosition = 0;
+    seconds = 0;
+    particles = [];
+    gameStats = {
+        left: { correct: 0, wrong: 0, avgTime: 0, totalTime: 0 },
+        right: { correct: 0, wrong: 0, avgTime: 0, totalTime: 0 }
+    };
+
+    // PLAY START SOUND
+    sound.start();
+
+    updateUI();
+    newQuestions();
+    if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+    }
+    draw();
+
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        seconds++;
+        document.getElementById("timer").textContent = `⏱️ Time: ${seconds}s`;
+    }, 1000);
+}
+
+
+
+
 // Initialize event listeners
 document.getElementById("startBtn").onclick = startGame;
 draw();

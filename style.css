@@ -471,3 +471,28 @@ main {
   .modal-box { padding: 30px 20px; }
   .modal-box h2 { font-size: 28px; }
 }
+
+
+
+
+/* Sound Toggle Button */
+.sound-toggle-btn {
+    padding: 8px 20px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    min-width: 50px;
+}
+
+.sound-toggle-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.sound-toggle-btn:active {
+    transform: scale(0.95);
+}
