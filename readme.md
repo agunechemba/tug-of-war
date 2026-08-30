@@ -1,6 +1,6 @@
-**Tug of War Math** is a high-energy, two-player educational game. Players engage in a head-to-head mental math battle where speed and accuracy physically move the rope on the screen.
+**Tug of War Math** is a high-energy educational game where players engage in a mental math battle.
 
-> NB: This game is built for large touch-screen devices.
+> NB: This game is optimized for large touch-screen devices.
 
 ## Key Features
 
@@ -12,6 +12,14 @@
     * **Pull Jerk:** The rope "jerks" toward the player immediately upon a correct answer.
     * **Error Shake:** The quiz panel vibrates violently when the wrong answer is chosen.
 * **Full Math Suite**: Generates random questions across **Addition, Subtraction, Multiplication, and Division**.
+* 
+* **Single-Player vs AI Mode**
+   * Battle against an intelligent AI opponent
+   * Choose from three difficulty levels:
+   * **Easy** (55% accuracy, 900-1900ms response time)
+   * **Medium** (70% accuracy, 500-1200ms response time)
+   * **Hard** (85% accuracy, 300-800ms response time)
+- Perfect for practicing math skills alone
 
 ### **[Play Tug Of War](https://agunechemba.name.ng/tug-of-war/)**
 
